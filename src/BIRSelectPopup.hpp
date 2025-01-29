@@ -1,3 +1,5 @@
+#include <Geode/ui/Popup.hpp>
+
 class BIRSelectPopup : public geode::Popup<GJGarageLayer*> {
 protected:
     GJGarageLayer* m_garageLayer;

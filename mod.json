@@ -1,27 +1,23 @@
 {
-    "geode": "4.0.0-beta.1",
+    "geode": "4.2.0",
     "gd": {
         "android": "2.2074",
         "win": "2.2074",
         "mac": "2.2074"
     },
-    "version": "v1.4.4",
+    "version": "v1.4.5",
     "id": "hiimjustin000.better_icon_randomizer",
     "name": "Better Icon Randomizer",
-    "developer": "hiimjustin000",
+    "developer": "hiimjasmine00",
     "description": "A mod based on randomizing icons and colors.",
-    "dependencies": [
-        {
-            "id": "geode.node-ids",
-            "version": ">=v1.12.0",
-            "importance": "required"
-        },
-        {
-            "id": "hiimjustin000.icon_randomizer_api",
-            "version": ">=v2.0.0",
-            "importance": "required"
+    "dependencies": {
+        "geode.node-ids": ">=v1.12.0",
+        "hiimjustin000.icon_randomizer_api": ">=v2.0.0",
+        "hiimjustin000.more_icons": {
+            "importance": "suggested",
+            "version": ">=v1.7.0"
         }
-    ],
+    },
     "resources": {
         "spritesheets": {
             "BIR_RandomSheet": [
@@ -49,7 +45,7 @@
     },
     "links": {
         "community": "https://discord.gg/QVKmbvBXA7",
-        "source": "https://github.com/hiimjustin000/BetterIconRandomizer",
+        "source": "https://github.com/hiimjasmine00/BetterIconRandomizer",
         "homepage": "https://www.hiimjustin000.com"
     },
     "tags": [

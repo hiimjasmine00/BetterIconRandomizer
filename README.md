@@ -7,7 +7,7 @@ A mod based on randomizing icons and colors.
 
 # Credits
 - [Reth22](https://gdbrowser.com/u/13446616) - Initial idea for the mod
-- [hiimjustin000](https://gdbrowser.com/u/7466002) - Creator of the mod
+- [hiimjasmine00](https://gdbrowser.com/u/7466002) - Creator of the mod
 
 # Gallery
 ![Randomize Popup](./resources/randomize-popup.png)

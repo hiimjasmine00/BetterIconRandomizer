@@ -1,6 +1,12 @@
-#include <Geode/loader/Dispatch.hpp>
-#include <hiimjustin000.icon_randomizer_api/include/IconRandomizer.hpp>
 #include "BIRSelectPopup.hpp"
+#include <Geode/binding/ButtonSprite.hpp>
+#include <Geode/binding/GameManager.hpp>
+#include <Geode/binding/GJGarageLayer.hpp>
+#include <Geode/binding/SimplePlayer.hpp>
+#include <Geode/loader/Mod.hpp>
+#include <Geode/utils/ranges.hpp>
+#include <hiimjustin000.icon_randomizer_api/include/IconRandomizer.hpp>
+#include <hiimjustin000.more_icons/include/MoreIcons.hpp>
 
 using namespace geode::prelude;
 
@@ -99,6 +105,8 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
     randomizeButton->setPosition({ 175.0f, 25.0f });
     m_buttonMenu->addChild(randomizeButton);
 
+    IconRandomizer::init();
+
     return true;
 }
 
@@ -115,7 +123,7 @@ void BIRSelectPopup::createSpecialToggle(const char* offFrame, const char* onFra
 }
 
 void BIRSelectPopup::createColorToggle(const char* label, ccColor3B color) {
-    auto darkColor = ccColor3B {
+    ccColor3B darkColor = {
         (unsigned char)floorf(color.r * 0.6f),
         (unsigned char)floorf(color.g * 0.6f),
         (unsigned char)floorf(color.b * 0.6f)
@@ -259,29 +267,10 @@ void BIRSelectPopup::randomize() {
     m_garageLayer->onSelectTab(m_garageLayer->getChildByID("category-menu")->getChildByTag((int)randomType));
     if (auto moreIconsNav = m_garageLayer->getChildByID("hiimjustin000.more_icons/navdot-menu")) {
         if (moreIconsTypes[randomType]) {
-            std::string iconKey;
-            switch (randomType) {
-                case IconType::Cube: iconKey = "icon"; break;
-                case IconType::Ship: iconKey = "ship"; break;
-                case IconType::Ball: iconKey = "ball"; break;
-                case IconType::Ufo: iconKey = "ufo"; break;
-                case IconType::Wave: iconKey = "wave"; break;
-                case IconType::Robot: iconKey = "robot"; break;
-                case IconType::Spider: iconKey = "spider"; break;
-                case IconType::Swing: iconKey = "swing"; break;
-                case IconType::Jetpack: iconKey = "jetpack"; break;
-                case IconType::Special: iconKey = "trail"; break;
-                case IconType::DeathEffect: iconKey = "death"; break;
-                default: break;
-            }
-
-            auto moreIcons = Loader::get()->getLoadedMod("hiimjustin000.more_icons");
-            auto customIcon = moreIcons->getSavedValue<std::string>(m_dual ? iconKey + "-dual" : iconKey);
-            auto loadedIcons = moreIcons->getSavedValue<std::vector<std::string>>(iconKey + "s");
-            auto foundIcon = std::find(loadedIcons.begin(), loadedIcons.end(), customIcon);
-            if (foundIcon != loadedIcons.end()) {
-                DispatchEvent<SimplePlayer*, std::string, IconType>("hiimjustin000.more_icons/simple-player", simplePlayer, customIcon, randomType).post();
-                auto navDot = static_cast<CCMenuItemSpriteExtra*>(moreIconsNav->getChildren()->objectAtIndex(std::distance(loadedIcons.begin(), foundIcon) / 36));
+            auto customIcon = MoreIcons::activeForType(randomType, m_dual);
+            if (auto foundIcon = ranges::indexOf(MoreIcons::vectorForType(randomType), customIcon)) {
+                MoreIcons::updateSimplePlayer(simplePlayer, customIcon, randomType);
+                auto navDot = static_cast<CCMenuItemSpriteExtra*>(moreIconsNav->getChildren()->objectAtIndex(foundIcon.value() / 36));
                 (navDot->m_pListener->*navDot->m_pfnSelector)(navDot);
             }
         }
@@ -293,6 +282,7 @@ void BIRSelectPopup::randomize() {
             (page->m_pListener->*page->m_pfnSelector)(page);
         }
     }
+
     onClose(nullptr);
 }
 

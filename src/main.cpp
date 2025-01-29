@@ -1,5 +1,5 @@
-#include <hiimjustin000.icon_randomizer_api/include/IconRandomizer.hpp>
 #include "BIRSelectPopup.hpp"
+#include <hiimjustin000.icon_randomizer_api/include/IconRandomizer.hpp>
 
 using namespace geode::prelude;
 
@@ -64,7 +64,6 @@ class $modify(BIRGarageLayer, GJGarageLayer) {
         shardsMenu->addChild(randomizeBtn);
         shardsMenu->updateLayout();
 
-        IconRandomizer::init();
         return true;
     }
 

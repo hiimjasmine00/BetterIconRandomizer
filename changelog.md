@@ -1,4 +1,7 @@
 # Better Icon Randomizer Changelog
+## v1.4.5 (2025-01-29)
+- Changed the More Icons support to match the new API
+
 ## v1.4.4 (2024-11-15)
 - Ported to Geode v4.0.0-beta.1
 
