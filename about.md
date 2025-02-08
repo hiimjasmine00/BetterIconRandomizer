@@ -10,4 +10,4 @@ A mod based on randomizing icons and colors.
 - [hiimjasmine00](user:7466002) - Creator of the mod
 
 # Gallery
-![Randomize Popup](hiimjustin000.better_icon_randomizer/randomize-popup.png?scale=0.9)
+![Randomize Popup](hiimjustin000.better_icon_randomizer/randomize-popup.png?width=300)

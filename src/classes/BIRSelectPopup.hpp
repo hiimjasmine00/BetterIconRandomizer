@@ -15,9 +15,9 @@ protected:
     bool m_dual;
 
     bool setup(GJGarageLayer*) override;
-    void createIconToggle(const char*, const char*);
-    void createSpecialToggle(const char*, const char*);
-    void createColorToggle(const char*, cocos2d::ccColor3B);
+    void createIconToggle(std::string_view, std::string_view, std::string_view);
+    void createSpecialToggle(std::string_view, std::string_view, std::string_view);
+    void createColorToggle(std::string_view, const cocos2d::ccColor3B&, std::string_view);
     void onToggle(cocos2d::CCArray*, CCMenuItemToggler*, CCMenuItemToggler*);
     void onAllToggle(cocos2d::CCArray*, CCMenuItemToggler*);
 public:

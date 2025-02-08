@@ -5,7 +5,7 @@
         "win": "2.2074",
         "mac": "2.2074"
     },
-    "version": "v1.4.5",
+    "version": "v1.4.6",
     "id": "hiimjustin000.better_icon_randomizer",
     "name": "Better Icon Randomizer",
     "developer": "hiimjasmine00",
@@ -40,7 +40,16 @@
             "description": "The color of the randomize button.",
             "type": "string",
             "default": "Random",
-            "one-of": ["Random", "Green", "Pink", "Blue", "Cyan", "Gray", "Dark Purple", "Dark Aqua"]
+            "one-of": [
+                "Random",
+                "Green",
+                "Pink",
+                "Blue",
+                "Cyan",
+                "Gray",
+                "Dark Purple",
+                "Dark Aqua"
+            ]
         }
     },
     "links": {

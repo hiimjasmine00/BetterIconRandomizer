@@ -1,4 +1,7 @@
 # Better Icon Randomizer Changelog
+## v1.4.6 (2025-02-07)
+- Added node IDs to the randomize selection popup
+
 ## v1.4.5 (2025-01-29)
 - Changed the More Icons support to match the new API
 

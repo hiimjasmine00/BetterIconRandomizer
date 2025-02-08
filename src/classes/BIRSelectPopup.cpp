@@ -21,7 +21,13 @@ BIRSelectPopup* BIRSelectPopup::create(GJGarageLayer* garageLayer) {
 }
 
 bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
+    setID("BIRSelectPopup");
     setTitle("Select Icons to Randomize");
+    m_title->setID("select-randomize-title");
+    m_mainLayer->setID("main-layer");
+    m_buttonMenu->setID("button-menu");
+    m_bgSprite->setID("background");
+    m_closeBtn->setID("close-button");
 
     m_garageLayer = garageLayer;
     m_separateDualIcons = Loader::get()->getLoadedMod("weebify.separate_dual_icons");
@@ -31,24 +37,25 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
     m_iconMenu->setLayout(RowLayout::create()->setGap(6.0f));
     m_iconMenu->setContentSize({ 340.0f, 30.0f });
     m_iconMenu->setPosition({ 175.0f, 100.0f });
+    m_iconMenu->setID("icon-menu");
     m_mainLayer->addChild(m_iconMenu);
 
     m_iconToggles = CCArray::create();
     m_iconToggles->retain();
-    createIconToggle("gj_iconBtn_off_001.png", "gj_iconBtn_on_001.png");
-    createIconToggle("gj_shipBtn_off_001.png", "gj_shipBtn_on_001.png");
-    createIconToggle("gj_ballBtn_off_001.png", "gj_ballBtn_on_001.png");
-    createIconToggle("gj_birdBtn_off_001.png", "gj_birdBtn_on_001.png");
-    createIconToggle("gj_dartBtn_off_001.png", "gj_dartBtn_on_001.png");
-    createIconToggle("gj_robotBtn_off_001.png", "gj_robotBtn_on_001.png");
-    createIconToggle("gj_spiderBtn_off_001.png", "gj_spiderBtn_on_001.png");
-    createIconToggle("gj_swingBtn_off_001.png", "gj_swingBtn_on_001.png");
-    createIconToggle("gj_jetpackBtn_off_001.png", "gj_jetpackBtn_on_001.png");
+    createIconToggle("gj_iconBtn_off_001.png", "gj_iconBtn_on_001.png", "cube-toggle");
+    createIconToggle("gj_shipBtn_off_001.png", "gj_shipBtn_on_001.png", "ship-toggle");
+    createIconToggle("gj_ballBtn_off_001.png", "gj_ballBtn_on_001.png", "ball-toggle");
+    createIconToggle("gj_birdBtn_off_001.png", "gj_birdBtn_on_001.png", "ufo-toggle");
+    createIconToggle("gj_dartBtn_off_001.png", "gj_dartBtn_on_001.png", "wave-toggle");
+    createIconToggle("gj_robotBtn_off_001.png", "gj_robotBtn_on_001.png", "robot-toggle");
+    createIconToggle("gj_spiderBtn_off_001.png", "gj_spiderBtn_on_001.png", "spider-toggle");
+    createIconToggle("gj_swingBtn_off_001.png", "gj_swingBtn_on_001.png", "swing-toggle");
+    createIconToggle("gj_jetpackBtn_off_001.png", "gj_jetpackBtn_on_001.png", "jetpack-toggle");
 
     m_specialToggles = CCArray::create();
     m_specialToggles->retain();
-    createSpecialToggle("gj_streakBtn_off_001.png", "gj_streakBtn_on_001.png");
-    createSpecialToggle("gj_explosionBtn_off_001.png", "gj_explosionBtn_on_001.png");
+    createSpecialToggle("gj_streakBtn_off_001.png", "gj_streakBtn_on_001.png", "trail-toggle");
+    createSpecialToggle("gj_explosionBtn_off_001.png", "gj_explosionBtn_on_001.png", "death-toggle");
 
     m_iconMenu->updateLayout();
 
@@ -56,14 +63,15 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
     m_colorMenu->setLayout(RowLayout::create()->setGap(20.0f));
     m_colorMenu->setContentSize({ 150.0f, 40.0f });
     m_colorMenu->setPosition({ 175.0f, 65.0f });
+    m_colorMenu->setID("color-menu");
     m_mainLayer->addChild(m_colorMenu);
 
     auto gameManager = GameManager::sharedState();
     m_colorToggles = CCArray::create();
     m_colorToggles->retain();
-    createColorToggle("1", gameManager->colorForIdx(IconRandomizer::active(ICON_RANDOMIZER_API_COLOR_1, m_dual)));
-    createColorToggle("2", gameManager->colorForIdx(IconRandomizer::active(ICON_RANDOMIZER_API_COLOR_2, m_dual)));
-    createColorToggle("G", gameManager->colorForIdx(IconRandomizer::active(ICON_RANDOMIZER_API_GLOW_COLOR, m_dual)));
+    createColorToggle("1", gameManager->colorForIdx(IconRandomizer::active(ICON_RANDOMIZER_API_COLOR_1, m_dual)), "color-1-toggle");
+    createColorToggle("2", gameManager->colorForIdx(IconRandomizer::active(ICON_RANDOMIZER_API_COLOR_2, m_dual)), "color-2-toggle");
+    createColorToggle("G", gameManager->colorForIdx(IconRandomizer::active(ICON_RANDOMIZER_API_GLOW_COLOR, m_dual)), "color-glow-toggle");
 
     m_colorMenu->updateLayout();
 
@@ -71,13 +79,23 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
     allMenu->setLayout(ColumnLayout::create()->setGap(6.0f)->setAxisReverse(true));
     allMenu->setContentSize({ 30.0f, 80.0f });
     allMenu->setPosition({ 332.5f, 45.0f });
+    allMenu->setID("all-menu");
     m_mainLayer->addChild(allMenu);
 
-    m_allIconsToggler = CCMenuItemExt::createTogglerWithStandardSprites(0.6f, [this](auto sender) { onAllToggle(m_iconToggles, sender); });
+    m_allIconsToggler = CCMenuItemExt::createTogglerWithStandardSprites(0.6f, [this](CCMenuItemToggler* sender) {
+        onAllToggle(m_iconToggles, sender);
+    });
+    m_allIconsToggler->setID("all-icons-toggle");
     allMenu->addChild(m_allIconsToggler);
-    m_allSpecialsToggler = CCMenuItemExt::createTogglerWithStandardSprites(0.6f, [this](auto sender) { onAllToggle(m_specialToggles, sender); });
+    m_allSpecialsToggler = CCMenuItemExt::createTogglerWithStandardSprites(0.6f, [this](CCMenuItemToggler* sender) {
+        onAllToggle(m_specialToggles, sender);
+    });
+    m_allSpecialsToggler->setID("all-specials-toggle");
     allMenu->addChild(m_allSpecialsToggler);
-    m_allColorsToggler = CCMenuItemExt::createTogglerWithStandardSprites(0.6f, [this](auto sender) { onAllToggle(m_colorToggles, sender); });
+    m_allColorsToggler = CCMenuItemExt::createTogglerWithStandardSprites(0.6f, [this](CCMenuItemToggler* sender) {
+        onAllToggle(m_colorToggles, sender);
+    });
+    m_allColorsToggler->setID("all-colors-toggle");
     allMenu->addChild(m_allColorsToggler);
 
     allMenu->updateLayout();
@@ -87,22 +105,29 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
     allLabels->setContentSize({ 70.0f, 70.0f });
     allLabels->setAnchorPoint({ 1.0f, 0.5f });
     allLabels->setPosition({ 320.0f, 45.0f });
+    allLabels->setID("all-labels");
     m_mainLayer->addChild(allLabels);
 
     auto iconsLabel = CCLabelBMFont::create("Icons", "bigFont.fnt");
     iconsLabel->setScale(0.5f);
+    iconsLabel->setID("all-icons-label");
     allLabels->addChild(iconsLabel);
     auto specialsLabel = CCLabelBMFont::create("Special", "bigFont.fnt");
     specialsLabel->setScale(0.5f);
+    specialsLabel->setID("all-specials-label");
     allLabels->addChild(specialsLabel);
     auto colorsLabel = CCLabelBMFont::create("Colors", "bigFont.fnt");
     colorsLabel->setScale(0.5f);
+    colorsLabel->setID("all-colors-label");
     allLabels->addChild(colorsLabel);
 
     allLabels->updateLayout();
 
-    auto randomizeButton = CCMenuItemExt::createSpriteExtra(ButtonSprite::create("Randomize", "goldFont.fnt", "GJ_button_01.png", 0.8f), [this](auto) { randomize(); });
+    auto randomizeButton = CCMenuItemExt::createSpriteExtra(ButtonSprite::create("Randomize", "goldFont.fnt", "GJ_button_01.png", 0.8f), [this](auto) {
+        randomize();
+    });
     randomizeButton->setPosition({ 175.0f, 25.0f });
+    randomizeButton->setID("randomize-button");
     m_buttonMenu->addChild(randomizeButton);
 
     IconRandomizer::init();
@@ -110,40 +135,49 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
     return true;
 }
 
-void BIRSelectPopup::createIconToggle(const char* offFrame, const char* onFrame) {
-    auto toggler = CCMenuItemExt::createTogglerWithFrameName(onFrame, offFrame, 0.75f, [this](auto sender) { onToggle(m_iconToggles, sender, m_allIconsToggler); });
+void BIRSelectPopup::createIconToggle(std::string_view offFrame, std::string_view onFrame, std::string_view nodeID) {
+    auto toggler = CCMenuItemExt::createTogglerWithFrameName(onFrame, offFrame, 0.75f, [this](CCMenuItemToggler* sender) {
+        onToggle(m_iconToggles, sender, m_allIconsToggler);
+    });
+    toggler->setID(nodeID.data());
     m_iconMenu->addChild(toggler);
     m_iconToggles->addObject(toggler);
 }
 
-void BIRSelectPopup::createSpecialToggle(const char* offFrame, const char* onFrame) {
-    auto toggler = CCMenuItemExt::createTogglerWithFrameName(onFrame, offFrame, 0.75f, [this](auto sender) { onToggle(m_specialToggles, sender, m_allSpecialsToggler); });
+void BIRSelectPopup::createSpecialToggle(std::string_view offFrame, std::string_view onFrame, std::string_view nodeID) {
+    auto toggler = CCMenuItemExt::createTogglerWithFrameName(onFrame, offFrame, 0.75f, [this](CCMenuItemToggler* sender) {
+        onToggle(m_specialToggles, sender, m_allSpecialsToggler);
+    });
+    toggler->setID(nodeID.data());
     m_iconMenu->addChild(toggler);
     m_specialToggles->addObject(toggler);
 }
 
-void BIRSelectPopup::createColorToggle(const char* label, ccColor3B color) {
+void BIRSelectPopup::createColorToggle(std::string_view label, const ccColor3B& color, std::string_view nodeID) {
     ccColor3B darkColor = {
         (unsigned char)floorf(color.r * 0.6f),
         (unsigned char)floorf(color.g * 0.6f),
         (unsigned char)floorf(color.b * 0.6f)
     };
 
-    auto colorLabelOff = CCLabelBMFont::create(label, "bigFont.fnt");
+    auto colorLabelOff = CCLabelBMFont::create(label.data(), "bigFont.fnt");
     colorLabelOff->setScale(0.5f);
     colorLabelOff->setColor(darkColor);
     auto colorSpriteOff = CCSprite::createWithSpriteFrameName("player_special_01_001.png");
     colorSpriteOff->setColor(darkColor);
     colorSpriteOff->addChild(colorLabelOff);
-    auto colorLabelOn = CCLabelBMFont::create(label, "bigFont.fnt");
+    auto colorLabelOn = CCLabelBMFont::create(label.data(), "bigFont.fnt");
     colorLabelOn->setScale(0.5f);
     colorLabelOn->setColor(color);
     auto colorSpriteOn = CCSprite::createWithSpriteFrameName("player_special_01_001.png");
     colorSpriteOn->setColor(color);
     colorSpriteOn->addChild(colorLabelOn);
-    auto toggler = CCMenuItemExt::createToggler(colorSpriteOn, colorSpriteOff, [this](auto sender) { onToggle(m_colorToggles, sender, m_allColorsToggler); });
+    auto toggler = CCMenuItemExt::createToggler(colorSpriteOn, colorSpriteOff, [this](CCMenuItemToggler* sender) {
+        onToggle(m_colorToggles, sender, m_allColorsToggler);
+    });
     colorLabelOff->setPosition(colorSpriteOff->getPosition());
     colorLabelOn->setPosition(colorSpriteOn->getPosition());
+    toggler->setID(nodeID.data());
     m_colorMenu->addChild(toggler);
     m_colorToggles->addObject(toggler);
 }
@@ -248,7 +282,7 @@ void BIRSelectPopup::randomize() {
 
     auto gameManager = GameManager::sharedState();
     auto randomType = enabledTypes.empty() ? m_dual ? (IconType)m_separateDualIcons->getSavedValue("lasttype", 0) : gameManager->m_playerIconType :
-        enabledTypes[(size_t)IconRandomizer::random(0, enabledTypes.size() - 1)];
+        enabledTypes[IconRandomizer::random(0, enabledTypes.size() - 1)];
     if (m_dual) {
         m_separateDualIcons->setSavedValue("lastmode", (int)randomType);
         m_separateDualIcons->setSavedValue("lasttype", (int)randomType);
