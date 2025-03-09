@@ -8,7 +8,8 @@ class $modify(BIRGarageLayer, GJGarageLayer) {
     bool init() override {
         if (!GJGarageLayer::init()) return false;
 
-        auto oldRBC = Mod::get()->getSettingValue<int64_t>("randomize-button-color");
+        auto mod = Mod::get();
+        auto oldRBC = mod->getSettingValue<int64_t>("randomize-button-color");
         if (oldRBC > 0) {
             std::string colorStr;
             switch (oldRBC) {
@@ -21,10 +22,11 @@ class $modify(BIRGarageLayer, GJGarageLayer) {
                 case 7: colorStr = "Dark Aqua"; break;
                 default: colorStr = "Random"; break;
             }
-            Mod::get()->setSettingValue<std::string>("randomize-button-color-new", colorStr);
-            Mod::get()->setSettingValue<int64_t>("randomize-button-color", 0);
+            mod->setSettingValue<std::string>("randomize-button-color-new", colorStr);
+            mod->setSettingValue<int64_t>("randomize-button-color", 0);
         }
-        auto colorStr = Mod::get()->getSettingValue<std::string>("randomize-button-color-new");
+
+        auto colorStr = mod->getSettingValue<std::string>("randomize-button-color-new");
         auto color = 0;
         if (colorStr == "Green") color = 1;
         else if (colorStr == "Pink") color = 2;
@@ -36,7 +38,7 @@ class $modify(BIRGarageLayer, GJGarageLayer) {
         else color = IconRandomizer::random(1, 7);
 
         auto randomizeBtn = CCMenuItemSpriteExtra::create(
-            CCSprite::createWithSpriteFrameName(fmt::format("BIR_randomBtn_{:02d}_001.png"_spr, color).c_str()),
+            CCSprite::createWithSpriteFrameName(fmt::format("BIR_randomBtn_{:02}_001.png"_spr, color).c_str()),
             this, menu_selector(BIRGarageLayer::onSelectRandomize)
         );
         randomizeBtn->setID("select-randomize-button"_spr);

@@ -1,4 +1,7 @@
 # Better Icon Randomizer Changelog
+## v1.5.0 (2025-03-08)
+- Overhauled the randomize selection popup, adding the ability to select ship fire and robot/spider animations separately
+
 ## v1.4.6 (2025-02-07)
 - Added node IDs to the randomize selection popup
 
