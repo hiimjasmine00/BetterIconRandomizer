@@ -366,7 +366,7 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
 
     allLabels->updateLayout();
 
-    auto shardsMenu = m_garageLayer->getChildByID("shards-menu"_spr);
+    auto shardsMenu = m_garageLayer->getChildByID("shards-menu");
     auto selectRandomizeButton = shardsMenu ? static_cast<CCMenuItemSprite*>(shardsMenu->getChildByID("select-randomize-button"_spr)) : nullptr;
     auto randomizeTogglesSprite = selectRandomizeButton ? CCSprite::createWithSpriteFrame(static_cast<CCSprite*>(
         selectRandomizeButton->getNormalImage())->displayFrame()) : CCSprite::createWithSpriteFrameName("BIR_randomBtn_01_001.png"_spr);
