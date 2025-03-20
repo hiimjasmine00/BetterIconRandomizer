@@ -13,13 +13,14 @@ protected:
     bool m_dual;
 
     bool setup(GJGarageLayer*) override;
-    void createIconToggle(cocos2d::CCMenu*, std::string_view, std::string_view, std::string_view);
-    void createSpecialToggle(cocos2d::CCMenu*, std::string_view, std::string_view);
-    void createColorToggle(cocos2d::CCMenu*, std::string_view, const cocos2d::ccColor3B&, std::string_view);
+    CCMenuItemSpriteExtra* createIconToggle(cocos2d::CCMenu*, std::string_view, std::string_view, int);
+    CCMenuItemSpriteExtra* createSpecialToggle(cocos2d::CCMenu*, std::string_view, int);
+    CCMenuItemSpriteExtra* createColorToggle(cocos2d::CCMenu*, std::string_view, const cocos2d::ccColor3B&, int);
 public:
     static BIRSelectPopup* create(GJGarageLayer*);
 
     void randomize();
+    void randomizeToggles();
 
     ~BIRSelectPopup() override;
 };

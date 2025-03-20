@@ -1,4 +1,8 @@
 # Better Icon Randomizer Changelog
+## v1.5.1 (2025-03-19)
+- Added saving of selected options in the randomize selection popup
+- Added keybinds to the randomize selection popup (Customizable through Custom Keybinds by Geode Team)
+
 ## v1.5.0 (2025-03-08)
 - Overhauled the randomize selection popup, adding the ability to select ship fire and robot/spider animations separately
 
