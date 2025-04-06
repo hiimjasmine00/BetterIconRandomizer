@@ -3,15 +3,20 @@
     "gd": {
         "android": "2.2074",
         "win": "2.2074",
-        "mac": "2.2074"
+        "mac": "2.2074",
+        "ios": "2.2074"
     },
-    "version": "v1.5.1",
+    "version": "v1.5.2",
     "id": "hiimjustin000.better_icon_randomizer",
     "name": "Better Icon Randomizer",
     "developer": "hiimjasmine00",
     "description": "A mod based on randomizing icons and colors.",
     "dependencies": {
-        "geode.custom-keybinds": ">=v1.10.0",
+        "geode.custom-keybinds": {
+            "importance": "required",
+            "version": ">=v1.10.0",
+            "platforms": ["win", "android", "mac"]
+        },
         "geode.node-ids": ">=v1.2.0",
         "hiimjustin000.icon_randomizer_api": ">=v2.2.0",
         "hiimjustin000.more_icons": {

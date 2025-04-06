@@ -1,4 +1,7 @@
 # Better Icon Randomizer Changelog
+## v1.5.2 (2025-04-05)
+- Added support for iOS
+
 ## v1.5.1 (2025-03-19)
 - Added saving of selected options in the randomize selection popup
 - Added keybinds to the randomize selection popup (Customizable through Custom Keybinds by Geode Team)

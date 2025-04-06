@@ -3,12 +3,16 @@
 #include <Geode/binding/GameManager.hpp>
 #include <Geode/binding/GJGarageLayer.hpp>
 #include <Geode/binding/SimplePlayer.hpp>
+#ifndef GEODE_IS_IOS
 #include <geode.custom-keybinds/include/Keybinds.hpp>
+#endif
 #include <hiimjustin000.icon_randomizer_api/include/IconRandomizer.hpp>
 #include <hiimjustin000.more_icons/include/MoreIcons.hpp>
 
 using namespace geode::prelude;
+#ifndef GEODE_IS_IOS
 using namespace keybinds;
+#endif
 
 std::map<RandomizeType, bool> TOGGLE_STATES = {
     { ICON_RANDOMIZER_API_COLOR_1, false },
@@ -29,6 +33,7 @@ std::map<RandomizeType, bool> TOGGLE_STATES = {
     { ICON_RANDOMIZER_API_ANIMATION, false }
 };
 
+#ifndef GEODE_IS_IOS
 $execute {
     auto bindManager = BindManager::get();
 
@@ -184,6 +189,7 @@ $execute {
         "Better Icon Randomizer"
     });
 }
+#endif
 
 BIRSelectPopup* BIRSelectPopup::create(GJGarageLayer* garageLayer) {
     auto ret = new BIRSelectPopup();
@@ -289,6 +295,7 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
         TOGGLE_STATES[ICON_RANDOMIZER_API_JETPACK]);
     allMenu->addChild(m_allIconsToggler);
 
+    #ifndef GEODE_IS_IOS
     addEventListener<InvokeBindFilter>([this](InvokeBindEvent* event) {
         if (event->isDown()) {
             (m_allIconsToggler->m_pListener->*m_allIconsToggler->m_pfnSelector)(m_allIconsToggler);
@@ -296,6 +303,7 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
         }
         return ListenerResult::Propagate;
     }, "select-all-icons"_spr);
+    #endif
 
     m_allSpecialsToggler = CCMenuItemExt::createTogglerWithStandardSprites(0.6f, [this](CCMenuItemToggler* sender) {
         auto toggled = sender->m_toggled;
@@ -310,6 +318,7 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
         TOGGLE_STATES[ICON_RANDOMIZER_API_ANIMATION] && TOGGLE_STATES[ICON_RANDOMIZER_API_DEATH_EFFECT]);
     allMenu->addChild(m_allSpecialsToggler);
 
+    #ifndef GEODE_IS_IOS
     addEventListener<InvokeBindFilter>([this](InvokeBindEvent* event) {
         if (event->isDown()) {
             (m_allSpecialsToggler->m_pListener->*m_allSpecialsToggler->m_pfnSelector)(m_allSpecialsToggler);
@@ -317,6 +326,7 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
         }
         return ListenerResult::Propagate;
     }, "select-all-specials"_spr);
+    #endif
 
     m_allColorsToggler = CCMenuItemExt::createTogglerWithStandardSprites(0.6f, [this](CCMenuItemToggler* sender) {
         auto toggled = sender->m_toggled;
@@ -331,6 +341,7 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
         TOGGLE_STATES[ICON_RANDOMIZER_API_GLOW_COLOR]);
     allMenu->addChild(m_allColorsToggler);
 
+    #ifndef GEODE_IS_IOS
     addEventListener<InvokeBindFilter>([this](InvokeBindEvent* event) {
         if (event->isDown()) {
             (m_allColorsToggler->m_pListener->*m_allColorsToggler->m_pfnSelector)(m_allColorsToggler);
@@ -338,6 +349,7 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
         }
         return ListenerResult::Propagate;
     }, "select-all-colors"_spr);
+    #endif
 
     allMenu->updateLayout();
 
@@ -376,10 +388,12 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
     randomizeTogglesButton->setID("randomize-toggles-button");
     m_buttonMenu->addChild(randomizeTogglesButton);
 
+    #ifndef GEODE_IS_IOS
     addEventListener<InvokeBindFilter>([this](InvokeBindEvent* event) {
         if (event->isDown()) randomizeToggles();
         return ListenerResult::Propagate;
     }, "randomize-toggles"_spr);
+    #endif
 
     auto randomizeButton = CCMenuItemExt::createSpriteExtra(ButtonSprite::create("Randomize", "goldFont.fnt", "GJ_button_01.png", 0.8f), [this](auto) {
         randomize();
@@ -388,10 +402,12 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
     randomizeButton->setID("randomize-button");
     m_buttonMenu->addChild(randomizeButton);
 
+    #ifndef GEODE_IS_IOS
     addEventListener<InvokeBindFilter>([this](InvokeBindEvent* event) {
         if (event->isDown()) randomize();
         return ListenerResult::Propagate;
     }, "randomize"_spr);
+    #endif
 
     IconRandomizer::init();
 
@@ -421,24 +437,12 @@ CCMenuItemSpriteExtra* BIRSelectPopup::createIconToggle(CCMenu* iconMenu, std::s
     iconMenu->addChild(toggler);
     m_iconToggles->addObject(toggler);
 
-    auto bindID = "";
-    switch (type) {
-        case ICON_RANDOMIZER_API_CUBE: bindID = "select-cube"_spr; break;
-        case ICON_RANDOMIZER_API_SHIP: bindID = "select-ship"_spr; break;
-        case ICON_RANDOMIZER_API_BALL: bindID = "select-ball"_spr; break;
-        case ICON_RANDOMIZER_API_UFO: bindID = "select-ufo"_spr; break;
-        case ICON_RANDOMIZER_API_WAVE: bindID = "select-wave"_spr; break;
-        case ICON_RANDOMIZER_API_ROBOT: bindID = "select-robot"_spr; break;
-        case ICON_RANDOMIZER_API_SPIDER: bindID = "select-spider"_spr; break;
-        case ICON_RANDOMIZER_API_SWING: bindID = "select-swing"_spr; break;
-        case ICON_RANDOMIZER_API_JETPACK: bindID = "select-jetpack"_spr; break;
-        default: return toggler;
-    }
-
+    #ifndef GEODE_IS_IOS
     addEventListener<InvokeBindFilter>([toggler](InvokeBindEvent* event) {
         if (event->isDown()) (toggler->m_pListener->*toggler->m_pfnSelector)(toggler);
         return ListenerResult::Propagate;
-    }, bindID);
+    }, keybindIDs[type]);
+    #endif
 
     return toggler;
 }
@@ -470,19 +474,12 @@ CCMenuItemSpriteExtra* BIRSelectPopup::createSpecialToggle(CCMenu* specialMenu, 
     specialMenu->addChild(toggler);
     m_specialToggles->addObject(toggler);
 
-    auto bindID = "";
-    switch (type) {
-        case ICON_RANDOMIZER_API_TRAIL: bindID = "select-trail"_spr; break;
-        case ICON_RANDOMIZER_API_SHIP_FIRE: bindID = "select-ship-fire"_spr; break;
-        case ICON_RANDOMIZER_API_ANIMATION: bindID = "select-animation"_spr; break;
-        case ICON_RANDOMIZER_API_DEATH_EFFECT: bindID = "select-death"_spr; break;
-        default: return toggler;
-    }
-
+    #ifndef GEODE_IS_IOS
     addEventListener<InvokeBindFilter>([toggler](InvokeBindEvent* event) {
         if (event->isDown()) (toggler->m_pListener->*toggler->m_pfnSelector)(toggler);
         return ListenerResult::Propagate;
-    }, bindID);
+    }, keybindIDs[type]);
+    #endif
 
     return toggler;
 }
@@ -522,18 +519,12 @@ CCMenuItemSpriteExtra* BIRSelectPopup::createColorToggle(CCMenu* colorMenu, std:
     colorMenu->addChild(toggler);
     m_colorToggles->addObject(toggler);
 
-    auto bindID = "";
-    switch (type) {
-        case ICON_RANDOMIZER_API_COLOR_1: bindID = "select-color-1"_spr; break;
-        case ICON_RANDOMIZER_API_COLOR_2: bindID = "select-color-2"_spr; break;
-        case ICON_RANDOMIZER_API_GLOW_COLOR: bindID = "select-color-glow"_spr; break;
-        default: return toggler;
-    }
-
+    #ifndef GEODE_IS_IOS
     addEventListener<InvokeBindFilter>([toggler](InvokeBindEvent* event) {
         if (event->isDown()) (toggler->m_pListener->*toggler->m_pfnSelector)(toggler);
         return ListenerResult::Propagate;
-    }, bindID);
+    }, keybindIDs[type]);
+    #endif
 
     return toggler;
 }
