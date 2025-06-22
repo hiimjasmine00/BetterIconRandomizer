@@ -9,7 +9,7 @@ endif()
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(GEODE_DISABLE_PRECOMPILED_HEADERS ON)
 
-project(BetterIconRandomizer VERSION 1.5.2)
+project(BetterIconRandomizer VERSION 1.5.3)
 
 add_library(${PROJECT_NAME} SHARED
     src/classes/BIRSelectPopup.cpp

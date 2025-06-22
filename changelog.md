@@ -1,4 +1,7 @@
 # Better Icon Randomizer Changelog
+## v1.5.3 (2025-06-22)
+- Ported to Geode v4.6.1
+
 ## v1.5.2 (2025-04-05)
 - Added support for iOS
 
