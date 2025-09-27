@@ -4,47 +4,49 @@
 
 using namespace geode::prelude;
 
+std::unordered_map<int, std::string> numberToName = {
+    { 1, "Green" },
+    { 2, "Pink" },
+    { 3, "Blue" },
+    { 4, "Cyan" },
+    { 5, "Gray" },
+    { 6, "Dark Purple" },
+    { 7, "Dark Aqua" }
+};
+std::unordered_map<std::string, int> nameToNumber = {
+    { "Green", 1 },
+    { "Pink", 2 },
+    { "Blue", 3 },
+    { "Cyan", 4 },
+    { "Gray", 5 },
+    { "Dark Purple", 6 },
+    { "Dark Aqua", 7 }
+};
+
 class $modify(BIRGarageLayer, GJGarageLayer) {
     bool init() override {
         if (!GJGarageLayer::init()) return false;
 
         auto mod = Mod::get();
-        auto oldRBC = mod->getSettingValue<int64_t>("randomize-button-color");
+        int oldRBC = mod->getSettingValue<int64_t>("randomize-button-color");
         if (oldRBC > 0) {
-            std::string colorStr;
-            switch (oldRBC) {
-                case 1: colorStr = "Green"; break;
-                case 2: colorStr = "Pink"; break;
-                case 3: colorStr = "Blue"; break;
-                case 4: colorStr = "Cyan"; break;
-                case 5: colorStr = "Gray"; break;
-                case 6: colorStr = "Dark Purple"; break;
-                case 7: colorStr = "Dark Aqua"; break;
-                default: colorStr = "Random"; break;
-            }
-            mod->setSettingValue<std::string>("randomize-button-color-new", colorStr);
+            auto it = numberToName.find(oldRBC);
+            mod->setSettingValue<std::string>("randomize-button-color-new", it != numberToName.end() ? it->second : "Random");
             mod->setSettingValue<int64_t>("randomize-button-color", 0);
         }
 
-        auto colorStr = mod->getSettingValue<std::string>("randomize-button-color-new");
-        auto color = 0;
-        if (colorStr == "Green") color = 1;
-        else if (colorStr == "Pink") color = 2;
-        else if (colorStr == "Blue") color = 3;
-        else if (colorStr == "Cyan") color = 4;
-        else if (colorStr == "Gray") color = 5;
-        else if (colorStr == "Dark Purple") color = 6;
-        else if (colorStr == "Dark Aqua") color = 7;
-        else color = IconRandomizer::random(1, 7);
-
+        auto it = nameToNumber.find(mod->getSettingValue<std::string>("randomize-button-color-new"));
         auto randomizeBtn = CCMenuItemSpriteExtra::create(
-            CCSprite::createWithSpriteFrameName(fmt::format("BIR_randomBtn_{:02}_001.png"_spr, color).c_str()),
+            CCSprite::createWithSpriteFrameName(
+                fmt::format("BIR_randomBtn_{:02}_001.png"_spr, it != nameToNumber.end() ? it->second : IconRandomizer::random(1, 7)).c_str()
+            ),
             this, menu_selector(BIRGarageLayer::onSelectRandomize)
         );
         randomizeBtn->setID("select-randomize-button"_spr);
-        auto shardsMenu = getChildByID("shards-menu");
-        shardsMenu->addChild(randomizeBtn);
-        shardsMenu->updateLayout();
+        if (auto shardsMenu = getChildByID("shards-menu")) {
+            shardsMenu->addChild(randomizeBtn);
+            shardsMenu->updateLayout();
+        }
 
         return true;
     }

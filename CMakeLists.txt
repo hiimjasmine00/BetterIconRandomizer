@@ -4,17 +4,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if ("${CMAKE_SYSTEM_NAME}" STREQUAL "iOS" OR IOS)
     set(CMAKE_OSX_ARCHITECTURES "arm64")
 else()
-    set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
+    set(CMAKE_OSX_ARCHITECTURES "arm64;x86_64")
 endif()
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(GEODE_DISABLE_PRECOMPILED_HEADERS ON)
 
-project(BetterIconRandomizer VERSION 1.5.3)
+project(BetterIconRandomizer VERSION 1.5.4)
 
-add_library(${PROJECT_NAME} SHARED
-    src/classes/BIRSelectPopup.cpp
-    src/hooks/GJGarageLayer.cpp
-)
+file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
+
+add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
 if (NOT DEFINED ENV{GEODE_SDK})
     message(FATAL_ERROR "Unable to find Geode SDK! Please define GEODE_SDK environment variable to point to Geode")

@@ -1,4 +1,8 @@
 # Better Icon Randomizer Changelog
+## v1.5.4 (2025-09-27)
+- Moved explode and glow randomization into their own toggles in the randomize selection popup
+- Removed Custom Keybinds dependency, only relying on it when the mod is enabled
+
 ## v1.5.3 (2025-06-22)
 - Ported to Geode v4.6.1
 
