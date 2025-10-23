@@ -10,7 +10,7 @@ An icon and color randomizer.
 - [hiimjasmine00](https://gdbrowser.com/u/7466002) - Creator of the mod
 
 ## Gallery
-![Randomize Popup](./resources/randomize-popup.png)
+![Randomize Popup](https://raw.githubusercontent.com/hiimjasmine00/BetterIconRandomizer/refs/heads/master/resources/randomize-popup.png)
 
 ## License
 This mod is licensed under the [MIT License](https://github.com/hiimjasmine00/BetterIconRandomizer/blob/master/LICENSE).
