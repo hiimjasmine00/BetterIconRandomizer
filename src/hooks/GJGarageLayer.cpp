@@ -4,16 +4,17 @@
 
 using namespace geode::prelude;
 
-std::unordered_map<int, std::string> numberToName = {
-    { 1, "Green" },
-    { 2, "Pink" },
-    { 3, "Blue" },
-    { 4, "Cyan" },
-    { 5, "Gray" },
-    { 6, "Dark Purple" },
-    { 7, "Dark Aqua" }
+constexpr std::array names = {
+    "Random",
+    "Green",
+    "Pink",
+    "Blue",
+    "Cyan",
+    "Gray",
+    "Dark Purple",
+    "Dark Aqua"
 };
-std::unordered_map<std::string, int> nameToNumber = {
+std::unordered_map<std::string, int> numbers = {
     { "Green", 1 },
     { "Pink", 2 },
     { "Blue", 3 },
@@ -30,15 +31,14 @@ class $modify(BIRGarageLayer, GJGarageLayer) {
         auto mod = Mod::get();
         int oldRBC = mod->getSettingValue<int64_t>("randomize-button-color");
         if (oldRBC > 0) {
-            auto it = numberToName.find(oldRBC);
-            mod->setSettingValue<std::string>("randomize-button-color-new", it != numberToName.end() ? it->second : "Random");
+            mod->setSettingValue<std::string>("randomize-button-color-new", oldRBC < names.size() ? names[oldRBC] : "Random");
             mod->setSettingValue<int64_t>("randomize-button-color", 0);
         }
 
-        auto it = nameToNumber.find(mod->getSettingValue<std::string>("randomize-button-color-new"));
+        auto it = numbers.find(mod->getSettingValue<std::string>("randomize-button-color-new"));
         auto randomizeBtn = CCMenuItemSpriteExtra::create(
             CCSprite::createWithSpriteFrameName(
-                fmt::format("BIR_randomBtn_{:02}_001.png"_spr, it != nameToNumber.end() ? it->second : IconRandomizer::random(1, 7)).c_str()
+                fmt::format("BIR_randomBtn_{:02}_001.png"_spr, it != numbers.end() ? it->second : IconRandomizer::random(1, 7)).c_str()
             ),
             this, menu_selector(BIRGarageLayer::onSelectRandomize)
         );

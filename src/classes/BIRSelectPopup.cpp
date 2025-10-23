@@ -19,13 +19,13 @@ void registerBindable(const std::string& id, const std::string& name, const std:
         std::vector<Ref<Bind>> defs;
         for (auto key : defaults) {
             if (auto keybind = KeybindV2::create(key)) {
-                defs.push_back(*keybind);
+                defs.push_back(keybind.unwrap());
             }
             else return;
         }
 
         if (auto action = BindableActionV2::create(id, name, desc, defs, *cat)) {
-            (void)BindManagerV2::registerBindable(*action);
+            (void)BindManagerV2::registerBindable(std::move(action).unwrap());
         }
     }
 }
