@@ -1,6 +1,7 @@
 #include "../classes/BIRSelectPopup.hpp"
 #include <Geode/modify/GJGarageLayer.hpp>
-#include <hiimjustin000.icon_randomizer_api/include/IconRandomizer.hpp>
+#include <jasmine/random.hpp>
+#include <jasmine/setting.hpp>
 
 using namespace geode::prelude;
 
@@ -28,17 +29,20 @@ class $modify(BIRGarageLayer, GJGarageLayer) {
     bool init() override {
         if (!GJGarageLayer::init()) return false;
 
-        auto mod = Mod::get();
-        int oldRBC = mod->getSettingValue<int64_t>("randomize-button-color");
-        if (oldRBC > 0) {
-            mod->setSettingValue<std::string>("randomize-button-color-new", oldRBC < names.size() ? names[oldRBC] : "Random");
-            mod->setSettingValue<int64_t>("randomize-button-color", 0);
+        auto oldSetting = jasmine::setting::get<int>("randomize-button-color");
+        auto newSetting = jasmine::setting::get<std::string>("randomize-button-color-new");
+        if (oldSetting && newSetting) {
+            int oldRBC = oldSetting->getValue();
+            if (oldRBC > 0) {
+                newSetting->setValue(oldRBC < names.size() ? names[oldRBC] : "Random");
+                oldSetting->setValue(0);
+            }
         }
 
-        auto it = numbers.find(mod->getSettingValue<std::string>("randomize-button-color-new"));
+        auto it = newSetting ? numbers.find(newSetting->getValue()) : numbers.end();
         auto randomizeBtn = CCMenuItemSpriteExtra::create(
             CCSprite::createWithSpriteFrameName(
-                fmt::format("BIR_randomBtn_{:02}_001.png"_spr, it != numbers.end() ? it->second : IconRandomizer::random(1, 7)).c_str()
+                fmt::format("BIR_randomBtn_{:02}_001.png"_spr, it != numbers.end() ? it->second : jasmine::random::getInt(1, 7)).c_str()
             ),
             this, menu_selector(BIRGarageLayer::onSelectRandomize)
         );

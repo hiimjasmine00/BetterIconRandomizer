@@ -6,6 +6,7 @@
 #include <geode.custom-keybinds/include/OptionalAPI.hpp>
 #include <hiimjustin000.icon_randomizer_api/include/IconRandomizer.hpp>
 #include <hiimjustin000.more_icons/include/MoreIcons.hpp>
+#include <jasmine/random.hpp>
 
 using namespace geode::prelude;
 using namespace keybinds;
@@ -217,19 +218,13 @@ void BIRSelectPopup::listen(cocos2d::CCMenuItem* item, const std::string& id) {
 
 void BIRSelectPopup::updateToggles(bool icons, bool specials, bool colors) {
     if (icons) {
-        m_allIconsToggler->toggle(std::all_of(toggleStates.begin() + 4, toggleStates.begin() + 13, [](bool state) {
-            return state;
-        }));
+        m_allIconsToggler->toggle(std::all_of(toggleStates.begin() + 4, toggleStates.begin() + 13, std::identity()));
     }
     if (specials) {
-        m_allSpecialsToggler->toggle(std::all_of(toggleStates.begin() + 13, toggleStates.begin() + 18, [](bool state) {
-            return state;
-        }));
+        m_allSpecialsToggler->toggle(std::all_of(toggleStates.begin() + 13, toggleStates.begin() + 18, std::identity()));
     }
     if (colors) {
-        m_allColorsToggler->toggle(std::all_of(toggleStates.begin(), toggleStates.begin() + 4, [](bool state) {
-            return state;
-        }));
+        m_allColorsToggler->toggle(std::all_of(toggleStates.begin(), toggleStates.begin() + 4, std::identity()));
     }
 }
 
@@ -376,19 +371,19 @@ void BIRSelectPopup::createAllToggle(CCMenu* menu, CCNode* node, const char* tex
 
 void BIRSelectPopup::randomizeToggles() {
     for (auto toggle : CCArrayExt<CCMenuItemToggler*>(m_iconToggles)) {
-        bool toggled = IconRandomizer::random(0, 1);
+        auto toggled = jasmine::random::getBool();
         toggleStates[(RandomizeType)toggle->getTag()] = toggled;
         toggle->toggle(toggled);
     }
 
     for (auto toggle : CCArrayExt<CCMenuItemToggler*>(m_specialToggles)) {
-        bool toggled = IconRandomizer::random(0, 1);
+        auto toggled = jasmine::random::getBool();
         toggleStates[(RandomizeType)toggle->getTag()] = toggled;
         toggle->toggle(toggled);
     }
 
     for (auto toggle : CCArrayExt<CCMenuItemToggler*>(m_colorToggles)) {
-        bool toggled = IconRandomizer::random(0, 1);
+        auto toggled = jasmine::random::getBool();
         toggleStates[(RandomizeType)toggle->getTag()] = toggled;
         toggle->toggle(toggled);
     }
@@ -452,7 +447,7 @@ void BIRSelectPopup::randomize() {
     if (enabledTypes.empty()) {
         if (specialEnabled || deathEnabled) {
             if (specialEnabled && deathEnabled) {
-                selectedType = (IconType)IconRandomizer::random(98, 99);
+                selectedType = (IconType)jasmine::random::getInt(98, 99);
             }
             else if (specialEnabled) {
                 selectedType = IconType::Special;
@@ -463,7 +458,7 @@ void BIRSelectPopup::randomize() {
         }
     }
     else {
-        randomType = enabledTypes[IconRandomizer::random(0, enabledTypes.size() - 1)];
+        randomType = enabledTypes[jasmine::random::getInt(0, enabledTypes.size() - 1)];
         selectedType = randomType;
     }
     auto activeIcon = IconRandomizer::active(IconRandomizer::fromIconType(selectedType), m_dual);
