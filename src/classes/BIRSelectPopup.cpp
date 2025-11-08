@@ -25,7 +25,7 @@ void registerBindable(const std::string& id, const std::string& name, const std:
             else return;
         }
 
-        if (auto action = BindableActionV2::create(id, name, desc, defs, *cat)) {
+        if (auto action = BindableActionV2::create(id, name, desc, defs, std::move(cat).unwrap())) {
             (void)BindManagerV2::registerBindable(std::move(action).unwrap());
         }
     }
