@@ -5,7 +5,8 @@
 #include <Geode/binding/SimplePlayer.hpp>
 #include <geode.custom-keybinds/include/OptionalAPI.hpp>
 #include <hiimjustin000.icon_randomizer_api/include/IconRandomizer.hpp>
-#include <hiimjustin000.more_icons/include/MoreIcons.hpp>
+#define MORE_ICONS_EVENTS
+#include <hiimjustin000.more_icons/include/MoreIconsV2.hpp>
 #include <jasmine/random.hpp>
 
 using namespace geode::prelude;
@@ -403,10 +404,9 @@ void BIRSelectPopup::randomize() {
             if (num > 0) {
                 m_garageLayer->m_iconPages[iconType] = (num - 1) / 36;
             }
-            else {
-                auto customIcons = MoreIcons::getIcons(iconType);
-                if (auto it = std::ranges::find(customIcons, MoreIcons::getIcon(iconType, m_dual)); it != customIcons.end()) {
-                    m_garageLayer->m_iconPages[iconType] = (gameManager->countForType(iconType) + 35) / 36 + (it - customIcons.begin()) / 36;
+            else if (auto icons = more_icons::getIcons(iconType)) {
+                if (auto icon = more_icons::getIcon(iconType, m_dual)) {
+                    m_garageLayer->m_iconPages[iconType] = (gameManager->countForType(iconType) + 35) / 36 + (icon - icons->data()) / 36;
                 }
             }
         }
@@ -426,10 +426,9 @@ void BIRSelectPopup::randomize() {
                 if (num > 0) {
                     m_garageLayer->m_iconPages[iconType] = (num - 1) / 36;
                 }
-                else {
-                    auto customIcons = MoreIcons::getIcons(iconType);
-                    if (auto it = std::ranges::find(customIcons, MoreIcons::getIcon(iconType, m_dual)); it != customIcons.end()) {
-                        m_garageLayer->m_iconPages[iconType] = (gameManager->countForType(iconType) + 35) / 36 + (it - customIcons.begin()) / 36;
+                else if (auto icons = more_icons::getIcons(iconType)) {
+                    if (auto icon = more_icons::getIcon(iconType, m_dual)) {
+                        m_garageLayer->m_iconPages[iconType] = (gameManager->countForType(iconType) + 35) / 36 + (icon - icons->data()) / 36;
                     }
                 }
             }
@@ -478,7 +477,7 @@ void BIRSelectPopup::randomize() {
     auto simplePlayer = m_dual ? static_cast<SimplePlayer*>(m_garageLayer->getChildByID("player2-icon")) : m_garageLayer->m_playerObject;
     simplePlayer->setScale(randomType == IconType::Jetpack ? 1.5f : 1.6f);
     simplePlayer->updatePlayerFrame(IconRandomizer::active(IconRandomizer::fromIconType(randomType), m_dual), randomType);
-    MoreIcons::updateSimplePlayer(simplePlayer, randomType, m_dual);
+    more_icons::updateSimplePlayer(simplePlayer, randomType, m_dual);
     simplePlayer->setColor(gameManager->colorForIdx(IconRandomizer::active(ICON_RANDOMIZER_API_COLOR_1, m_dual)));
     simplePlayer->setSecondColor(gameManager->colorForIdx(IconRandomizer::active(ICON_RANDOMIZER_API_COLOR_2, m_dual)));
     simplePlayer->enableCustomGlowColor(gameManager->colorForIdx(IconRandomizer::active(ICON_RANDOMIZER_API_GLOW_COLOR, m_dual)));

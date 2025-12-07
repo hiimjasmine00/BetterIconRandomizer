@@ -1,4 +1,7 @@
 # Better Icon Randomizer Changelog
+## v1.5.5 (2025-12-07)
+- Updated More Icons support to match the new API
+
 ## v1.5.4 (2025-09-27)
 - Moved explode and glow randomization into their own toggles in the randomize selection popup
 - Removed Custom Keybinds dependency, only relying on it when the mod is enabled
