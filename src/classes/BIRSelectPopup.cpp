@@ -3,21 +3,22 @@
 #include <Geode/binding/GameManager.hpp>
 #include <Geode/binding/GJGarageLayer.hpp>
 #include <Geode/binding/SimplePlayer.hpp>
-#include <geode.custom-keybinds/include/OptionalAPI.hpp>
+//#include <geode.custom-keybinds/include/OptionalAPI.hpp>
+#include <Geode/loader/Mod.hpp>
+#include <Geode/utils/random.hpp>
 #include <hiimjustin000.icon_randomizer_api/include/IconRandomizer.hpp>
 #define MORE_ICONS_EVENTS
-#include <hiimjustin000.more_icons/include/MoreIconsV2.hpp>
-#include <jasmine/random.hpp>
+#include <hiimjustin000.more_icons/include/MoreIcons.hpp>
 
 using namespace geode::prelude;
-using namespace keybinds;
+//using namespace keybinds;
 
 std::array<bool, 18> toggleStates = {
     false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
 };
 
 void registerBindable(const std::string& id, const std::string& name, const std::string& desc, std::initializer_list<enumKeyCodes> defaults) {
-    if (auto cat = CategoryV2::create("Better Icon Randomizer")) {
+    /*if (auto cat = CategoryV2::create("Better Icon Randomizer")) {
         std::vector<Ref<Bind>> defs;
         for (auto key : defaults) {
             if (auto keybind = KeybindV2::create(key)) {
@@ -29,7 +30,7 @@ void registerBindable(const std::string& id, const std::string& name, const std:
         if (auto action = BindableActionV2::create(id, name, desc, defs, std::move(cat).unwrap())) {
             (void)BindManagerV2::registerBindable(std::move(action).unwrap());
         }
-    }
+    }*/
 }
 
 void registerBindables() {
@@ -73,16 +74,16 @@ $execute {
             registerBindables();
         }
         else {
-            new EventListener(+[](ModStateEvent*) {
+            ModStateEvent(ModEventType::Loaded, customKeybinds).listen([] {
                 registerBindables();
-            }, ModStateFilter(customKeybinds, ModEventType::Loaded));
+            }).leak();
         }
     }
 }
 
 BIRSelectPopup* BIRSelectPopup::create(GJGarageLayer* garageLayer) {
     auto ret = new BIRSelectPopup();
-    if (ret->initAnchored(350.0f, 150.0f, garageLayer)) {
+    if (ret->init(garageLayer)) {
         ret->autorelease();
         return ret;
     }
@@ -90,7 +91,9 @@ BIRSelectPopup* BIRSelectPopup::create(GJGarageLayer* garageLayer) {
     return nullptr;
 }
 
-bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
+bool BIRSelectPopup::init(GJGarageLayer* garageLayer) {
+    if (!Popup::init(350.0f, 150.0f)) return false;
+
     setID("BIRSelectPopup");
     setTitle("Select Icons to Randomize", "goldFont.fnt", 0.7f, 15.0f);
     m_title->setID("select-randomize-title");
@@ -111,15 +114,15 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
     m_mainLayer->addChild(iconMenu);
 
     m_iconToggles = CCArray::create();
-    createIconToggle(iconMenu, "icon", "cube", ICON_RANDOMIZER_API_CUBE);
-    createIconToggle(iconMenu, "ship", "ship", ICON_RANDOMIZER_API_SHIP);
-    createIconToggle(iconMenu, "ball", "ball", ICON_RANDOMIZER_API_BALL);
-    createIconToggle(iconMenu, "bird", "ufo", ICON_RANDOMIZER_API_UFO);
-    createIconToggle(iconMenu, "dart", "wave", ICON_RANDOMIZER_API_WAVE);
-    createIconToggle(iconMenu, "robot", "robot", ICON_RANDOMIZER_API_ROBOT);
-    createIconToggle(iconMenu, "spider", "spider", ICON_RANDOMIZER_API_SPIDER);
-    createIconToggle(iconMenu, "swing", "swing", ICON_RANDOMIZER_API_SWING);
-    createIconToggle(iconMenu, "jetpack", "jetpack", ICON_RANDOMIZER_API_JETPACK);
+    createIconToggle(iconMenu, "icon", "cube", RandomizeType::Cube);
+    createIconToggle(iconMenu, "ship", "ship", RandomizeType::Ship);
+    createIconToggle(iconMenu, "ball", "ball", RandomizeType::Ball);
+    createIconToggle(iconMenu, "bird", "ufo", RandomizeType::Ufo);
+    createIconToggle(iconMenu, "dart", "wave", RandomizeType::Wave);
+    createIconToggle(iconMenu, "robot", "robot", RandomizeType::Robot);
+    createIconToggle(iconMenu, "spider", "spider", RandomizeType::Spider);
+    createIconToggle(iconMenu, "swing", "swing", RandomizeType::Swing);
+    createIconToggle(iconMenu, "jetpack", "jetpack", RandomizeType::Jetpack);
 
     iconMenu->updateLayout();
 
@@ -131,12 +134,11 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
     m_mainLayer->addChild(specialMenu);
 
     m_specialToggles = CCArray::create();
-    createSpecialToggle(specialMenu, "player_special", "trail", ICON_RANDOMIZER_API_TRAIL);
-    createSpecialToggle(specialMenu, "shipfireIcon", "ship-fire", ICON_RANDOMIZER_API_SHIP_FIRE);
-    createSpecialToggle(specialMenu, "gjItem", "animation", ICON_RANDOMIZER_API_ANIMATION);
-    createSpecialToggle(specialMenu, "explosionIcon", "death", ICON_RANDOMIZER_API_DEATH_EFFECT);
-    createSpecialToggle(specialMenu, "", "explode", ICON_RANDOMIZER_API_EXPLODE);
-
+    createSpecialToggle(specialMenu, "player_special", "trail", RandomizeType::Trail);
+    createSpecialToggle(specialMenu, "shipfireIcon", "ship-fire", RandomizeType::ShipFire);
+    createSpecialToggle(specialMenu, "gjItem", "animation", RandomizeType::Animation);
+    createSpecialToggle(specialMenu, "explosionIcon", "death", RandomizeType::DeathEffect);
+    createSpecialToggle(specialMenu, "", "explode", RandomizeType::Explode);
     specialMenu->updateLayout();
 
     auto colorMenu = CCMenu::create();
@@ -147,10 +149,10 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
     m_mainLayer->addChild(colorMenu);
 
     m_colorToggles = CCArray::create();
-    createColorToggle(colorMenu, "1", "color-1", ICON_RANDOMIZER_API_COLOR_1);
-    createColorToggle(colorMenu, "2", "color-2", ICON_RANDOMIZER_API_COLOR_2);
-    createColorToggle(colorMenu, "G", "color-glow", ICON_RANDOMIZER_API_GLOW_COLOR);
-    createColorToggle(colorMenu, "", "glow", ICON_RANDOMIZER_API_GLOW);
+    createColorToggle(colorMenu, "1", "color-1", RandomizeType::Color1);
+    createColorToggle(colorMenu, "2", "color-2", RandomizeType::Color2);
+    createColorToggle(colorMenu, "G", "color-glow", RandomizeType::GlowColor);
+    createColorToggle(colorMenu, "", "glow", RandomizeType::Glow);
 
     colorMenu->updateLayout();
 
@@ -173,9 +175,9 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
     allLabels->setID("all-labels");
     m_mainLayer->addChild(allLabels);
 
-    createAllToggle(allMenu, allLabels, "Icons", "icons", ICON_RANDOMIZER_API_ALL_ICONS);
-    createAllToggle(allMenu, allLabels, "Specials", "specials", ICON_RANDOMIZER_API_ALL_SPECIAL);
-    createAllToggle(allMenu, allLabels, "Colors", "colors", ICON_RANDOMIZER_API_ALL_COLORS);
+    createAllToggle(allMenu, allLabels, "Icons", "icons", RandomizeAllType::Icons);
+    createAllToggle(allMenu, allLabels, "Specials", "specials", RandomizeAllType::Special);
+    createAllToggle(allMenu, allLabels, "Colors", "colors", RandomizeAllType::Colors);
 
     allMenu->updateLayout();
     allLabels->updateLayout();
@@ -211,10 +213,10 @@ bool BIRSelectPopup::setup(GJGarageLayer* garageLayer) {
 }
 
 void BIRSelectPopup::listen(cocos2d::CCMenuItem* item, const std::string& id) {
-    addEventListener<InvokeBindFilterV2>([item](InvokeBindEventV2* event) {
+    /*addEventListener<InvokeBindFilterV2>([item](InvokeBindEventV2* event) {
         if (event->isDown()) item->activate();
         return ListenerResult::Propagate;
-    }, id);
+    }, id);*/
 }
 
 void BIRSelectPopup::updateToggles(bool icons, bool specials, bool colors) {
@@ -229,15 +231,17 @@ void BIRSelectPopup::updateToggles(bool icons, bool specials, bool colors) {
     }
 }
 
-CCMenuItemToggler* BIRSelectPopup::createToggle(CCMenu* menu, CCArray* array, CCNode* offNode, CCNode* onNode, std::string_view id, int type) {
+CCMenuItemToggler* BIRSelectPopup::createToggle(
+    CCMenu* menu, CCArray* array, CCNode* offNode, CCNode* onNode, std::string_view id, RandomizeType type
+) {
     auto toggler = CCMenuItemExt::createToggler(onNode, offNode, [this](CCMenuItemToggler* sender) {
         auto type = sender->getTag();
         if (type < 0 || type > 17) return;
-        toggleStates[(RandomizeType)type] = !sender->m_toggled;
+        toggleStates[type] = !sender->m_toggled;
         updateToggles(type > 3 && type < 13, type > 12, type < 4);
     });
-    toggler->toggle(toggleStates[(RandomizeType)type]);
-    toggler->setTag(type);
+    toggler->toggle(toggleStates[(int)type]);
+    toggler->setTag((int)type);
     toggler->setID(fmt::format("{}-toggle", id));
     menu->addChild(toggler);
     array->addObject(toggler);
@@ -247,7 +251,7 @@ CCMenuItemToggler* BIRSelectPopup::createToggle(CCMenu* menu, CCArray* array, CC
     return toggler;
 }
 
-void BIRSelectPopup::createIconToggle(CCMenu* menu, std::string_view prefix, std::string_view id, int type) {
+void BIRSelectPopup::createIconToggle(CCMenu* menu, std::string_view prefix, std::string_view id, RandomizeType type) {
     auto offSprite = CCSprite::createWithSpriteFrameName(fmt::format("gj_{}Btn_off_001.png", prefix).c_str());
     offSprite->setScale(0.6f);
 
@@ -257,12 +261,12 @@ void BIRSelectPopup::createIconToggle(CCMenu* menu, std::string_view prefix, std
     createToggle(menu, m_iconToggles, offSprite, onSprite, id, type);
 }
 
-void BIRSelectPopup::createSpecialToggle(CCMenu* menu, std::string_view prefix, std::string_view id, int type) {
+void BIRSelectPopup::createSpecialToggle(CCMenu* menu, std::string_view prefix, std::string_view id, RandomizeType type) {
     CCSprite* offSprite = nullptr;
     CCSprite* onSprite = nullptr;
     const char* sizeFrame = nullptr;
 
-    if (type == ICON_RANDOMIZER_API_EXPLODE) {
+    if (type == RandomizeType::Explode) {
         offSprite = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
         offSprite->setScale(0.6f);
 
@@ -273,7 +277,7 @@ void BIRSelectPopup::createSpecialToggle(CCMenu* menu, std::string_view prefix, 
     }
     else {
         auto frame = fmt::format("{}_{:02}_001.png", prefix,
-            type != ICON_RANDOMIZER_API_ANIMATION ? IconRandomizer::active((RandomizeType)type, m_dual) : 18);
+            type != RandomizeType::Animation ? IconRandomizer::active(type, m_dual) : 18);
 
         offSprite = CCSprite::createWithSpriteFrameName(frame.c_str());
         offSprite->setScale(0.65f);
@@ -290,12 +294,12 @@ void BIRSelectPopup::createSpecialToggle(CCMenu* menu, std::string_view prefix, 
     toggler->updateSprite();
 }
 
-void BIRSelectPopup::createColorToggle(CCMenu* menu, const char* label, std::string_view id, int type) {
+void BIRSelectPopup::createColorToggle(CCMenu* menu, const char* label, std::string_view id, RandomizeType type) {
     CCSprite* offSprite = nullptr;
     CCSprite* onSprite = nullptr;
     const char* sizeFrame = nullptr;
 
-    if (type == ICON_RANDOMIZER_API_GLOW) {
+    if (type == RandomizeType::Glow) {
         offSprite = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
         offSprite->setScale(0.8f);
 
@@ -305,7 +309,7 @@ void BIRSelectPopup::createColorToggle(CCMenu* menu, const char* label, std::str
         sizeFrame = "GJ_checkOff_001.png";
     }
     else {
-        auto color = GameManager::get()->colorForIdx(IconRandomizer::active((RandomizeType)type, m_dual));
+        auto color = GameManager::get()->colorForIdx(IconRandomizer::active(type, m_dual));
         ccColor3B darkColor(color.r * 0.6, color.g * 0.6, color.b * 0.6);
 
         offSprite = CCSprite::createWithSpriteFrameName("player_special_01_001.png");
@@ -334,26 +338,26 @@ void BIRSelectPopup::createColorToggle(CCMenu* menu, const char* label, std::str
     toggler->updateSprite();
 }
 
-void BIRSelectPopup::createAllToggle(CCMenu* menu, CCNode* node, const char* text, std::string_view id, int type) {
+void BIRSelectPopup::createAllToggle(CCMenu* menu, CCNode* node, const char* text, std::string_view id, RandomizeAllType type) {
     auto toggler = CCMenuItemExt::createTogglerWithStandardSprites(0.6f, [this](CCMenuItemToggler* sender) {
         auto toggled = !sender->m_toggled;
         for (auto toggle : CCArrayExt<CCMenuItemToggler*>(static_cast<CCArray*>(sender->getUserObject("toggles"_spr)))) {
             toggle->toggle(toggled);
-            toggleStates[(RandomizeType)toggle->getTag()] = toggled;
+            toggleStates[toggle->getTag()] = toggled;
         }
     });
     switch (type) {
-        case ICON_RANDOMIZER_API_ALL_ICONS:
+        case RandomizeAllType::Icons:
             m_allIconsToggler = toggler;
             updateToggles(true, false, false);
             toggler->setUserObject("toggles"_spr, m_iconToggles);
             break;
-        case ICON_RANDOMIZER_API_ALL_SPECIAL:
+        case RandomizeAllType::Special:
             m_allSpecialsToggler = toggler;
             updateToggles(false, true, false);
             toggler->setUserObject("toggles"_spr, m_specialToggles);
             break;
-        case ICON_RANDOMIZER_API_ALL_COLORS:
+        case RandomizeAllType::Colors:
             m_allColorsToggler = toggler;
             updateToggles(false, false, true);
             toggler->setUserObject("toggles"_spr, m_colorToggles);
@@ -372,20 +376,20 @@ void BIRSelectPopup::createAllToggle(CCMenu* menu, CCNode* node, const char* tex
 
 void BIRSelectPopup::randomizeToggles() {
     for (auto toggle : CCArrayExt<CCMenuItemToggler*>(m_iconToggles)) {
-        auto toggled = jasmine::random::getBool();
-        toggleStates[(RandomizeType)toggle->getTag()] = toggled;
+        auto toggled = random::generate<bool>();
+        toggleStates[toggle->getTag()] = toggled;
         toggle->toggle(toggled);
     }
 
     for (auto toggle : CCArrayExt<CCMenuItemToggler*>(m_specialToggles)) {
-        auto toggled = jasmine::random::getBool();
-        toggleStates[(RandomizeType)toggle->getTag()] = toggled;
+        auto toggled = random::generate<bool>();
+        toggleStates[toggle->getTag()] = toggled;
         toggle->toggle(toggled);
     }
 
     for (auto toggle : CCArrayExt<CCMenuItemToggler*>(m_colorToggles)) {
-        auto toggled = jasmine::random::getBool();
-        toggleStates[(RandomizeType)toggle->getTag()] = toggled;
+        auto toggled = random::generate<bool>();
+        toggleStates[toggle->getTag()] = toggled;
         toggle->toggle(toggled);
     }
 
@@ -405,7 +409,7 @@ void BIRSelectPopup::randomize() {
                 m_garageLayer->m_iconPages[iconType] = (num - 1) / 36;
             }
             else if (auto icons = more_icons::getIcons(iconType)) {
-                if (auto icon = more_icons::getIcon(iconType, m_dual)) {
+                if (auto icon = more_icons::activeIcon(iconType, m_dual)) {
                     m_garageLayer->m_iconPages[iconType] = (gameManager->countForType(iconType) + 35) / 36 + (icon - icons->data()) / 36;
                 }
             }
@@ -418,16 +422,16 @@ void BIRSelectPopup::randomize() {
     for (auto toggle : CCArrayExt<CCMenuItemToggler*>(m_specialToggles)) {
         if (toggle->m_toggled) {
             auto type = (RandomizeType)toggle->getTag();
-            if (type == ICON_RANDOMIZER_API_DEATH_EFFECT || type == ICON_RANDOMIZER_API_EXPLODE) deathEnabled = true;
+            if (type == RandomizeType::DeathEffect || type == RandomizeType::Explode) deathEnabled = true;
             else specialEnabled = true;
             auto num = IconRandomizer::randomize(type, m_dual);
-            if (type != ICON_RANDOMIZER_API_ANIMATION && type != ICON_RANDOMIZER_API_EXPLODE) {
+            if (type != RandomizeType::Animation && type != RandomizeType::Explode) {
                 auto iconType = IconRandomizer::toIconType(type);
                 if (num > 0) {
                     m_garageLayer->m_iconPages[iconType] = (num - 1) / 36;
                 }
                 else if (auto icons = more_icons::getIcons(iconType)) {
-                    if (auto icon = more_icons::getIcon(iconType, m_dual)) {
+                    if (auto icon = more_icons::activeIcon(iconType, m_dual)) {
                         m_garageLayer->m_iconPages[iconType] = (gameManager->countForType(iconType) + 35) / 36 + (icon - icons->data()) / 36;
                     }
                 }
@@ -446,7 +450,7 @@ void BIRSelectPopup::randomize() {
     if (enabledTypes.empty()) {
         if (specialEnabled || deathEnabled) {
             if (specialEnabled && deathEnabled) {
-                selectedType = (IconType)jasmine::random::getInt(98, 99);
+                selectedType = (IconType)random::generate(98, 99);
             }
             else if (specialEnabled) {
                 selectedType = IconType::Special;
@@ -457,7 +461,7 @@ void BIRSelectPopup::randomize() {
         }
     }
     else {
-        randomType = enabledTypes[jasmine::random::getInt(0, enabledTypes.size() - 1)];
+        randomType = enabledTypes[random::generate(0uz, enabledTypes.size() - 1)];
         selectedType = randomType;
     }
     auto activeIcon = IconRandomizer::active(IconRandomizer::fromIconType(selectedType), m_dual);
@@ -478,10 +482,10 @@ void BIRSelectPopup::randomize() {
     simplePlayer->setScale(randomType == IconType::Jetpack ? 1.5f : 1.6f);
     simplePlayer->updatePlayerFrame(IconRandomizer::active(IconRandomizer::fromIconType(randomType), m_dual), randomType);
     more_icons::updateSimplePlayer(simplePlayer, randomType, m_dual);
-    simplePlayer->setColor(gameManager->colorForIdx(IconRandomizer::active(ICON_RANDOMIZER_API_COLOR_1, m_dual)));
-    simplePlayer->setSecondColor(gameManager->colorForIdx(IconRandomizer::active(ICON_RANDOMIZER_API_COLOR_2, m_dual)));
-    simplePlayer->enableCustomGlowColor(gameManager->colorForIdx(IconRandomizer::active(ICON_RANDOMIZER_API_GLOW_COLOR, m_dual)));
-    simplePlayer->m_hasGlowOutline = IconRandomizer::active(ICON_RANDOMIZER_API_GLOW, m_dual) != 0;
+    simplePlayer->setColor(gameManager->colorForIdx(IconRandomizer::active(RandomizeType::Color1, m_dual)));
+    simplePlayer->setSecondColor(gameManager->colorForIdx(IconRandomizer::active(RandomizeType::Color2, m_dual)));
+    simplePlayer->enableCustomGlowColor(gameManager->colorForIdx(IconRandomizer::active(RandomizeType::GlowColor, m_dual)));
+    simplePlayer->m_hasGlowOutline = IconRandomizer::active(RandomizeType::Glow, m_dual) != 0;
     simplePlayer->updateColors();
 
     m_garageLayer->selectTab(selectedType);

@@ -1,6 +1,6 @@
 #include "../classes/BIRSelectPopup.hpp"
 #include <Geode/modify/GJGarageLayer.hpp>
-#include <jasmine/random.hpp>
+#include <Geode/utils/random.hpp>
 #include <jasmine/setting.hpp>
 
 using namespace geode::prelude;
@@ -15,7 +15,7 @@ constexpr std::array names = {
     "Dark Purple",
     "Dark Aqua"
 };
-std::unordered_map<std::string, int> numbers = {
+StringMap<int> numbers = {
     { "Green", 1 },
     { "Pink", 2 },
     { "Blue", 3 },
@@ -42,7 +42,7 @@ class $modify(BIRGarageLayer, GJGarageLayer) {
         auto it = newSetting ? numbers.find(newSetting->getValue()) : numbers.end();
         auto randomizeBtn = CCMenuItemSpriteExtra::create(
             CCSprite::createWithSpriteFrameName(
-                fmt::format("BIR_randomBtn_{:02}_001.png"_spr, it != numbers.end() ? it->second : jasmine::random::getInt(1, 7)).c_str()
+                fmt::format("BIR_randomBtn_{:02}_001.png"_spr, it != numbers.end() ? it->second : random::generate(1, 7)).c_str()
             ),
             this, menu_selector(BIRGarageLayer::onSelectRandomize)
         );

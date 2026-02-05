@@ -38,6 +38,20 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: hiimjasmine00/download-geode-dependency@main
+        with:
+          repository: hiimjasmine00/IconRandomizerAPI
+          workflow: build.yml
+          branch: master
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: hiimjasmine00/download-geode-dependency@main
+        with:
+          repository: hiimjasmine00/MoreIcons
+          workflow: build.yml
+          branch: master
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build the mod
         uses: hiimjasmine00/build-geode-mod@xwin
         with:
