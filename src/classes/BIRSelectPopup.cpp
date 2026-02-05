@@ -212,7 +212,7 @@ bool BIRSelectPopup::init(GJGarageLayer* garageLayer) {
     return true;
 }
 
-void BIRSelectPopup::listen(cocos2d::CCMenuItem* item, const std::string& id) {
+void BIRSelectPopup::listen(CCMenuItem* item, const std::string& id) {
     /*addEventListener<InvokeBindFilterV2>([item](InvokeBindEventV2* event) {
         if (event->isDown()) item->activate();
         return ListenerResult::Propagate;
