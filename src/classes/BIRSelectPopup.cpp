@@ -113,7 +113,6 @@ bool BIRSelectPopup::init(GJGarageLayer* garageLayer) {
     iconMenu->setID("icon-menu");
     m_mainLayer->addChild(iconMenu);
 
-    m_iconToggles = CCArray::create();
     createIconToggle(iconMenu, "icon", "cube", RandomizeType::Cube);
     createIconToggle(iconMenu, "ship", "ship", RandomizeType::Ship);
     createIconToggle(iconMenu, "ball", "ball", RandomizeType::Ball);
@@ -133,7 +132,6 @@ bool BIRSelectPopup::init(GJGarageLayer* garageLayer) {
     specialMenu->setID("special-menu");
     m_mainLayer->addChild(specialMenu);
 
-    m_specialToggles = CCArray::create();
     createSpecialToggle(specialMenu, "player_special", "trail", RandomizeType::Trail);
     createSpecialToggle(specialMenu, "shipfireIcon", "ship-fire", RandomizeType::ShipFire);
     createSpecialToggle(specialMenu, "gjItem", "animation", RandomizeType::Animation);
@@ -148,7 +146,6 @@ bool BIRSelectPopup::init(GJGarageLayer* garageLayer) {
     colorMenu->setID("color-menu");
     m_mainLayer->addChild(colorMenu);
 
-    m_colorToggles = CCArray::create();
     createColorToggle(colorMenu, "1", "color-1", RandomizeType::Color1);
     createColorToggle(colorMenu, "2", "color-2", RandomizeType::Color2);
     createColorToggle(colorMenu, "G", "color-glow", RandomizeType::GlowColor);
@@ -232,7 +229,7 @@ void BIRSelectPopup::updateToggles(bool icons, bool specials, bool colors) {
 }
 
 CCMenuItemToggler* BIRSelectPopup::createToggle(
-    CCMenu* menu, CCArray* array, CCNode* offNode, CCNode* onNode, std::string_view id, RandomizeType type
+    CCMenu* menu, std::vector<CCMenuItemToggler*>& array, CCNode* offNode, CCNode* onNode, std::string_view id, RandomizeType type
 ) {
     auto toggler = CCMenuItemExt::createToggler(onNode, offNode, [this](CCMenuItemToggler* sender) {
         auto type = sender->getTag();
@@ -244,7 +241,7 @@ CCMenuItemToggler* BIRSelectPopup::createToggle(
     toggler->setTag((int)type);
     toggler->setID(fmt::format("{}-toggle", id));
     menu->addChild(toggler);
-    array->addObject(toggler);
+    array.push_back(toggler);
 
     listen(toggler, fmt::format("select-{}"_spr, id));
 
@@ -339,9 +336,21 @@ void BIRSelectPopup::createColorToggle(CCMenu* menu, const char* label, std::str
 }
 
 void BIRSelectPopup::createAllToggle(CCMenu* menu, CCNode* node, const char* text, std::string_view id, RandomizeAllType type) {
-    auto toggler = CCMenuItemExt::createTogglerWithStandardSprites(0.6f, [this](CCMenuItemToggler* sender) {
+    std::vector<CCMenuItemToggler*>* toggles = nullptr;
+    switch (type) {
+        case RandomizeAllType::Icons:
+            toggles = &m_iconToggles;
+            break;
+        case RandomizeAllType::Special:
+            toggles = &m_specialToggles;
+            break;
+        case RandomizeAllType::Colors:
+            toggles = &m_colorToggles;
+            break;
+    }
+    auto toggler = CCMenuItemExt::createTogglerWithStandardSprites(0.6f, [this, toggles](CCMenuItemToggler* sender) {
         auto toggled = !sender->m_toggled;
-        for (auto toggle : CCArrayExt<CCMenuItemToggler*>(static_cast<CCArray*>(sender->getUserObject("toggles"_spr)))) {
+        for (auto toggle : *toggles) {
             toggle->toggle(toggled);
             toggleStates[toggle->getTag()] = toggled;
         }
@@ -350,17 +359,14 @@ void BIRSelectPopup::createAllToggle(CCMenu* menu, CCNode* node, const char* tex
         case RandomizeAllType::Icons:
             m_allIconsToggler = toggler;
             updateToggles(true, false, false);
-            toggler->setUserObject("toggles"_spr, m_iconToggles);
             break;
         case RandomizeAllType::Special:
             m_allSpecialsToggler = toggler;
             updateToggles(false, true, false);
-            toggler->setUserObject("toggles"_spr, m_specialToggles);
             break;
         case RandomizeAllType::Colors:
             m_allColorsToggler = toggler;
             updateToggles(false, false, true);
-            toggler->setUserObject("toggles"_spr, m_colorToggles);
             break;
     }
     toggler->setID(fmt::format("all-{}-toggle", id));
@@ -375,19 +381,19 @@ void BIRSelectPopup::createAllToggle(CCMenu* menu, CCNode* node, const char* tex
 }
 
 void BIRSelectPopup::randomizeToggles() {
-    for (auto toggle : CCArrayExt<CCMenuItemToggler*>(m_iconToggles)) {
+    for (auto toggle : m_iconToggles) {
         auto toggled = random::generate<bool>();
         toggleStates[toggle->getTag()] = toggled;
         toggle->toggle(toggled);
     }
 
-    for (auto toggle : CCArrayExt<CCMenuItemToggler*>(m_specialToggles)) {
+    for (auto toggle : m_specialToggles) {
         auto toggled = random::generate<bool>();
         toggleStates[toggle->getTag()] = toggled;
         toggle->toggle(toggled);
     }
 
-    for (auto toggle : CCArrayExt<CCMenuItemToggler*>(m_colorToggles)) {
+    for (auto toggle : m_colorToggles) {
         auto toggled = random::generate<bool>();
         toggleStates[toggle->getTag()] = toggled;
         toggle->toggle(toggled);
@@ -399,7 +405,7 @@ void BIRSelectPopup::randomizeToggles() {
 void BIRSelectPopup::randomize() {
     auto gameManager = GameManager::get();
     std::vector<IconType> enabledTypes;
-    for (auto toggle : CCArrayExt<CCMenuItemToggler*>(m_iconToggles)) {
+    for (auto toggle : m_iconToggles) {
         if (toggle->m_toggled) {
             auto type = (RandomizeType)toggle->getTag();
             auto iconType = IconRandomizer::toIconType(type);
@@ -419,7 +425,7 @@ void BIRSelectPopup::randomize() {
     auto specialEnabled = false;
     auto deathEnabled = false;
 
-    for (auto toggle : CCArrayExt<CCMenuItemToggler*>(m_specialToggles)) {
+    for (auto toggle : m_specialToggles) {
         if (toggle->m_toggled) {
             auto type = (RandomizeType)toggle->getTag();
             if (type == RandomizeType::DeathEffect || type == RandomizeType::Explode) deathEnabled = true;
@@ -439,7 +445,7 @@ void BIRSelectPopup::randomize() {
         }
     }
 
-    for (auto toggle : CCArrayExt<CCMenuItemToggler*>(m_colorToggles)) {
+    for (auto toggle : m_colorToggles) {
         if (toggle->m_toggled) {
             IconRandomizer::randomize((RandomizeType)toggle->getTag(), m_dual);
         }
