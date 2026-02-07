@@ -113,6 +113,7 @@ bool BIRSelectPopup::init(GJGarageLayer* garageLayer) {
     iconMenu->setID("icon-menu");
     m_mainLayer->addChild(iconMenu);
 
+    m_iconToggles.reserve(9);
     createIconToggle(iconMenu, "icon", "cube", RandomizeType::Cube);
     createIconToggle(iconMenu, "ship", "ship", RandomizeType::Ship);
     createIconToggle(iconMenu, "ball", "ball", RandomizeType::Ball);
@@ -132,6 +133,7 @@ bool BIRSelectPopup::init(GJGarageLayer* garageLayer) {
     specialMenu->setID("special-menu");
     m_mainLayer->addChild(specialMenu);
 
+    m_specialToggles.reserve(5);
     createSpecialToggle(specialMenu, "player_special", "trail", RandomizeType::Trail);
     createSpecialToggle(specialMenu, "shipfireIcon", "ship-fire", RandomizeType::ShipFire);
     createSpecialToggle(specialMenu, "gjItem", "animation", RandomizeType::Animation);
@@ -146,6 +148,7 @@ bool BIRSelectPopup::init(GJGarageLayer* garageLayer) {
     colorMenu->setID("color-menu");
     m_mainLayer->addChild(colorMenu);
 
+    m_colorToggles.reserve(4);
     createColorToggle(colorMenu, "1", "color-1", RandomizeType::Color1);
     createColorToggle(colorMenu, "2", "color-2", RandomizeType::Color2);
     createColorToggle(colorMenu, "G", "color-glow", RandomizeType::GlowColor);
