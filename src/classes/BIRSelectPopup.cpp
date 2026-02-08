@@ -70,10 +70,10 @@ void registerBindables() {
 
 $execute {
     if (auto customKeybinds = Loader::get()->getInstalledMod("geode.custom-keybinds")) {
-        if (customKeybinds->isEnabled()) {
+        if (customKeybinds->isLoaded()) {
             registerBindables();
         }
-        else {
+        else if (customKeybinds->shouldLoad()) {
             ModStateEvent(ModEventType::Loaded, customKeybinds).listen([] {
                 registerBindables();
             }).leak();
