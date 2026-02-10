@@ -81,9 +81,9 @@ $execute {
     }
 }
 
-BIRSelectPopup* BIRSelectPopup::create(GJGarageLayer* garageLayer) {
+BIRSelectPopup* BIRSelectPopup::create(GJGarageLayer* garageLayer, CCSpriteFrame* spriteFrame) {
     auto ret = new BIRSelectPopup();
-    if (ret->init(garageLayer)) {
+    if (ret->init(garageLayer, spriteFrame)) {
         ret->autorelease();
         return ret;
     }
@@ -91,7 +91,7 @@ BIRSelectPopup* BIRSelectPopup::create(GJGarageLayer* garageLayer) {
     return nullptr;
 }
 
-bool BIRSelectPopup::init(GJGarageLayer* garageLayer) {
+bool BIRSelectPopup::init(GJGarageLayer* garageLayer, CCSpriteFrame* spriteFrame) {
     if (!Popup::init(350.0f, 150.0f)) return false;
 
     setID("BIRSelectPopup");
@@ -113,7 +113,7 @@ bool BIRSelectPopup::init(GJGarageLayer* garageLayer) {
     iconMenu->setID("icon-menu");
     m_mainLayer->addChild(iconMenu);
 
-    m_iconToggles.reserve(9);
+    m_toggles[0].reserve(9);
     createIconToggle(iconMenu, "icon", "cube", RandomizeType::Cube);
     createIconToggle(iconMenu, "ship", "ship", RandomizeType::Ship);
     createIconToggle(iconMenu, "ball", "ball", RandomizeType::Ball);
@@ -133,7 +133,7 @@ bool BIRSelectPopup::init(GJGarageLayer* garageLayer) {
     specialMenu->setID("special-menu");
     m_mainLayer->addChild(specialMenu);
 
-    m_specialToggles.reserve(5);
+    m_toggles[1].reserve(5);
     createSpecialToggle(specialMenu, "player_special", "trail", RandomizeType::Trail);
     createSpecialToggle(specialMenu, "shipfireIcon", "ship-fire", RandomizeType::ShipFire);
     createSpecialToggle(specialMenu, "gjItem", "animation", RandomizeType::Animation);
@@ -148,7 +148,7 @@ bool BIRSelectPopup::init(GJGarageLayer* garageLayer) {
     colorMenu->setID("color-menu");
     m_mainLayer->addChild(colorMenu);
 
-    m_colorToggles.reserve(4);
+    m_toggles[2].reserve(4);
     createColorToggle(colorMenu, "1", "color-1", RandomizeType::Color1);
     createColorToggle(colorMenu, "2", "color-2", RandomizeType::Color2);
     createColorToggle(colorMenu, "G", "color-glow", RandomizeType::GlowColor);
@@ -182,25 +182,16 @@ bool BIRSelectPopup::init(GJGarageLayer* garageLayer) {
     allMenu->updateLayout();
     allLabels->updateLayout();
 
-    auto shardsMenu = garageLayer->getChildByID("shards-menu");
-    auto selectRandomizeButton = shardsMenu ? static_cast<CCMenuItemSprite*>(shardsMenu->getChildByID("select-randomize-button"_spr)) : nullptr;
-    auto randomizeFrame = selectRandomizeButton
-        ? static_cast<CCSprite*>(selectRandomizeButton->getNormalImage())->displayFrame()
-        : CCSpriteFrameCache::get()->spriteFrameByName("BIR_randomBtn_01_001.png"_spr);
-    auto randomizeTogglesSprite = CCSprite::createWithSpriteFrame(randomizeFrame);
+    auto randomizeTogglesSprite = CCSprite::createWithSpriteFrame(spriteFrame);
     randomizeTogglesSprite->setScale(0.8f);
-    auto randomizeTogglesButton = CCMenuItemExt::createSpriteExtra(randomizeTogglesSprite, [this](auto) {
-        randomizeToggles();
-    });
+    auto randomizeTogglesButton = CCMenuItemSpriteExtra::create(randomizeTogglesSprite, this, menu_selector(BIRSelectPopup::onRandomizeToggles));
     randomizeTogglesButton->setPosition({ 25.0f, 25.0f });
     randomizeTogglesButton->setID("randomize-toggles-button");
     m_buttonMenu->addChild(randomizeTogglesButton);
 
     listen(randomizeTogglesButton, "randomize-toggles"_spr);
 
-    auto randomizeButton = CCMenuItemExt::createSpriteExtra(ButtonSprite::create("Randomize", 0.8f), [this](auto) {
-        randomize();
-    });
+    auto randomizeButton = CCMenuItemSpriteExtra::create(ButtonSprite::create("Randomize", 0.8f), this, menu_selector(BIRSelectPopup::onRandomize));
     randomizeButton->setPosition({ 175.0f, 25.0f });
     randomizeButton->setID("randomize-button");
     m_buttonMenu->addChild(randomizeButton);
@@ -221,25 +212,20 @@ void BIRSelectPopup::listen(CCMenuItem* item, const std::string& id) {
 
 void BIRSelectPopup::updateToggles(bool icons, bool specials, bool colors) {
     if (icons) {
-        m_allIconsToggler->toggle(std::all_of(toggleStates.begin() + 4, toggleStates.begin() + 13, std::identity()));
+        m_allTogglers[0]->toggle(std::all_of(toggleStates.begin() + 4, toggleStates.begin() + 13, std::identity()));
     }
     if (specials) {
-        m_allSpecialsToggler->toggle(std::all_of(toggleStates.begin() + 13, toggleStates.begin() + 18, std::identity()));
+        m_allTogglers[1]->toggle(std::all_of(toggleStates.begin() + 13, toggleStates.begin() + 18, std::identity()));
     }
     if (colors) {
-        m_allColorsToggler->toggle(std::all_of(toggleStates.begin(), toggleStates.begin() + 4, std::identity()));
+        m_allTogglers[2]->toggle(std::all_of(toggleStates.begin(), toggleStates.begin() + 4, std::identity()));
     }
 }
 
 CCMenuItemToggler* BIRSelectPopup::createToggle(
     CCMenu* menu, std::vector<CCMenuItemToggler*>& array, CCNode* offNode, CCNode* onNode, std::string_view id, RandomizeType type
 ) {
-    auto toggler = CCMenuItemExt::createToggler(onNode, offNode, [this](CCMenuItemToggler* sender) {
-        auto type = sender->getTag();
-        if (type < 0 || type > 17) return;
-        toggleStates[type] = !sender->m_toggled;
-        updateToggles(type > 3 && type < 13, type > 12, type < 4);
-    });
+    auto toggler = CCMenuItemToggler::create(offNode, onNode, this, menu_selector(BIRSelectPopup::onToggle));
     toggler->toggle(toggleStates[(int)type]);
     toggler->setTag((int)type);
     toggler->setID(fmt::format("{}-toggle", id));
@@ -251,6 +237,13 @@ CCMenuItemToggler* BIRSelectPopup::createToggle(
     return toggler;
 }
 
+void BIRSelectPopup::onToggle(CCObject* sender) {
+    auto type = sender->getTag();
+    if (type < 0 || type > 17) return;
+    toggleStates[type] = !static_cast<CCMenuItemToggler*>(sender)->m_toggled;
+    updateToggles(type > 3 && type < 13, type > 12, type < 4);
+}
+
 void BIRSelectPopup::createIconToggle(CCMenu* menu, std::string_view prefix, std::string_view id, RandomizeType type) {
     auto offSprite = CCSprite::createWithSpriteFrameName(fmt::format("gj_{}Btn_off_001.png", prefix).c_str());
     offSprite->setScale(0.6f);
@@ -258,7 +251,7 @@ void BIRSelectPopup::createIconToggle(CCMenu* menu, std::string_view prefix, std
     auto onSprite = CCSprite::createWithSpriteFrameName(fmt::format("gj_{}Btn_on_001.png", prefix).c_str());
     onSprite->setScale(0.6f);
 
-    createToggle(menu, m_iconToggles, offSprite, onSprite, id, type);
+    createToggle(menu, m_toggles[0], offSprite, onSprite, id, type);
 }
 
 void BIRSelectPopup::createSpecialToggle(CCMenu* menu, std::string_view prefix, std::string_view id, RandomizeType type) {
@@ -289,7 +282,7 @@ void BIRSelectPopup::createSpecialToggle(CCMenu* menu, std::string_view prefix, 
         sizeFrame = "playerSquare_001.png";
     }
 
-    auto toggler = createToggle(menu, m_specialToggles, offSprite, onSprite, id, type);
+    auto toggler = createToggle(menu, m_toggles[1], offSprite, onSprite, id, type);
     toggler->setContentSize(CCSpriteFrameCache::get()->spriteFrameByName(sizeFrame)->getOriginalSize() * 0.65f);
     toggler->updateSprite();
 }
@@ -333,45 +326,20 @@ void BIRSelectPopup::createColorToggle(CCMenu* menu, const char* label, std::str
         sizeFrame = "player_special_01_001.png";
     }
 
-    auto toggler = createToggle(menu, m_colorToggles, offSprite, onSprite, id, type);
+    auto toggler = createToggle(menu, m_toggles[2], offSprite, onSprite, id, type);
     toggler->setContentSize(CCSpriteFrameCache::get()->spriteFrameByName(sizeFrame)->getOriginalSize() * 0.9f);
     toggler->updateSprite();
 }
 
 void BIRSelectPopup::createAllToggle(CCMenu* menu, CCNode* node, const char* text, std::string_view id, RandomizeAllType type) {
-    std::vector<CCMenuItemToggler*>* toggles = nullptr;
-    switch (type) {
-        case RandomizeAllType::Icons:
-            toggles = &m_iconToggles;
-            break;
-        case RandomizeAllType::Special:
-            toggles = &m_specialToggles;
-            break;
-        case RandomizeAllType::Colors:
-            toggles = &m_colorToggles;
-            break;
-    }
-    auto toggler = CCMenuItemExt::createTogglerWithStandardSprites(0.6f, [this, toggles](CCMenuItemToggler* sender) {
-        auto toggled = !sender->m_toggled;
-        for (auto toggle : *toggles) {
-            toggle->toggle(toggled);
-            toggleStates[toggle->getTag()] = toggled;
-        }
-    });
-    switch (type) {
-        case RandomizeAllType::Icons:
-            m_allIconsToggler = toggler;
-            updateToggles(true, false, false);
-            break;
-        case RandomizeAllType::Special:
-            m_allSpecialsToggler = toggler;
-            updateToggles(false, true, false);
-            break;
-        case RandomizeAllType::Colors:
-            m_allColorsToggler = toggler;
-            updateToggles(false, false, true);
-            break;
-    }
+    auto offSprite = CCSprite::createWithSpriteFrameName("GJ_checkOff_001.png");
+    offSprite->setScale(0.6f);
+    auto onSprite = CCSprite::createWithSpriteFrameName("GJ_checkOn_001.png");
+    onSprite->setScale(0.6f);
+    auto toggler = CCMenuItemToggler::create(offSprite, onSprite, this, menu_selector(BIRSelectPopup::onAllToggle));
+    m_allTogglers[(int)type] = toggler;
+    updateToggles(type == RandomizeAllType::Icons, type == RandomizeAllType::Special, type == RandomizeAllType::Colors);
+    toggler->setTag((int)type);
     toggler->setID(fmt::format("all-{}-toggle", id));
     menu->addChild(toggler);
 
@@ -383,20 +351,30 @@ void BIRSelectPopup::createAllToggle(CCMenu* menu, CCNode* node, const char* tex
     node->addChild(label);
 }
 
-void BIRSelectPopup::randomizeToggles() {
-    for (auto toggle : m_iconToggles) {
+void BIRSelectPopup::onAllToggle(CCObject* sender) {
+    auto type = sender->getTag();
+    if (type < 0 || type > 2) return;
+    auto toggled = !static_cast<CCMenuItemToggler*>(sender)->m_toggled;
+    for (auto toggle : m_toggles[type]) {
+        toggle->toggle(toggled);
+        toggleStates[toggle->getTag()] = toggled;
+    }
+}
+
+void BIRSelectPopup::onRandomizeToggles(CCObject* sender) {
+    for (auto toggle : m_toggles[0]) {
         auto toggled = random::generate<bool>();
         toggleStates[toggle->getTag()] = toggled;
         toggle->toggle(toggled);
     }
 
-    for (auto toggle : m_specialToggles) {
+    for (auto toggle : m_toggles[1]) {
         auto toggled = random::generate<bool>();
         toggleStates[toggle->getTag()] = toggled;
         toggle->toggle(toggled);
     }
 
-    for (auto toggle : m_colorToggles) {
+    for (auto toggle : m_toggles[2]) {
         auto toggled = random::generate<bool>();
         toggleStates[toggle->getTag()] = toggled;
         toggle->toggle(toggled);
@@ -405,10 +383,10 @@ void BIRSelectPopup::randomizeToggles() {
     updateToggles(true, true, true);
 }
 
-void BIRSelectPopup::randomize() {
+void BIRSelectPopup::onRandomize(CCObject* sender) {
     auto gameManager = GameManager::get();
     std::vector<IconType> enabledTypes;
-    for (auto toggle : m_iconToggles) {
+    for (auto toggle : m_toggles[0]) {
         if (toggle->m_toggled) {
             auto type = (RandomizeType)toggle->getTag();
             auto iconType = IconRandomizer::toIconType(type);
@@ -428,7 +406,7 @@ void BIRSelectPopup::randomize() {
     auto specialEnabled = false;
     auto deathEnabled = false;
 
-    for (auto toggle : m_specialToggles) {
+    for (auto toggle : m_toggles[1]) {
         if (toggle->m_toggled) {
             auto type = (RandomizeType)toggle->getTag();
             if (type == RandomizeType::DeathEffect || type == RandomizeType::Explode) deathEnabled = true;
@@ -448,7 +426,7 @@ void BIRSelectPopup::randomize() {
         }
     }
 
-    for (auto toggle : m_colorToggles) {
+    for (auto toggle : m_toggles[2]) {
         if (toggle->m_toggled) {
             IconRandomizer::randomize((RandomizeType)toggle->getTag(), m_dual);
         }

@@ -55,7 +55,7 @@ class $modify(BIRGarageLayer, GJGarageLayer) {
         return true;
     }
 
-    void onSelectRandomize(CCObject*) {
-        BIRSelectPopup::create(this)->show();
+    void onSelectRandomize(CCObject* sender) {
+        BIRSelectPopup::create(this, static_cast<CCSprite*>(static_cast<CCMenuItemSprite*>(sender)->getNormalImage())->displayFrame())->show();
     }
 };
