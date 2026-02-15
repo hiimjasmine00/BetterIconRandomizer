@@ -11,7 +11,7 @@ protected:
     bool m_dual;
 
     bool init(GJGarageLayer*, cocos2d::CCSpriteFrame*);
-    void listen(cocos2d::CCMenuItem*, const std::string&);
+    void listen(cocos2d::CCMenuItem*, std::string);
     void updateToggles(bool, bool, bool);
     CCMenuItemToggler* createToggle(
         cocos2d::CCMenu*, std::vector<CCMenuItemToggler*>&, cocos2d::CCNode*, cocos2d::CCNode*, std::string_view, RandomizeType

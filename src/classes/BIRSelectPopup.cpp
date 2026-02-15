@@ -3,7 +3,6 @@
 #include <Geode/binding/GameManager.hpp>
 #include <Geode/binding/GJGarageLayer.hpp>
 #include <Geode/binding/SimplePlayer.hpp>
-//#include <geode.custom-keybinds/include/OptionalAPI.hpp>
 #include <Geode/loader/Mod.hpp>
 #include <Geode/utils/random.hpp>
 #include <hiimjustin000.icon_randomizer_api/include/IconRandomizer.hpp>
@@ -11,75 +10,10 @@
 #include <hiimjustin000.more_icons/include/MoreIcons.hpp>
 
 using namespace geode::prelude;
-//using namespace keybinds;
 
 std::array<bool, 18> toggleStates = {
     false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
 };
-
-void registerBindable(const std::string& id, const std::string& name, const std::string& desc, std::initializer_list<enumKeyCodes> defaults) {
-    /*if (auto cat = CategoryV2::create("Better Icon Randomizer")) {
-        std::vector<Ref<Bind>> defs;
-        for (auto key : defaults) {
-            if (auto keybind = KeybindV2::create(key)) {
-                defs.push_back(keybind.unwrap());
-            }
-            else return;
-        }
-
-        if (auto action = BindableActionV2::create(id, name, desc, defs, std::move(cat).unwrap())) {
-            (void)BindManagerV2::registerBindable(std::move(action).unwrap());
-        }
-    }*/
-}
-
-void registerBindables() {
-    // Icon Toggles
-    registerBindable("select-cube"_spr, "Select Cube Toggle", "Selects the cube toggle.", { KEY_Q });
-    registerBindable("select-ship"_spr, "Select Ship Toggle", "Selects the ship toggle.", { KEY_W });
-    registerBindable("select-ball"_spr, "Select Ball Toggle", "Selects the ball toggle.", { KEY_E });
-    registerBindable("select-ufo"_spr, "Select UFO Toggle", "Selects the UFO toggle.", { KEY_R });
-    registerBindable("select-wave"_spr, "Select Wave Toggle", "Selects the wave toggle.", { KEY_T });
-    registerBindable("select-robot"_spr, "Select Robot Toggle", "Selects the robot toggle.", { KEY_Y });
-    registerBindable("select-spider"_spr, "Select Spider Toggle", "Selects the spider toggle.", { KEY_U });
-    registerBindable("select-swing"_spr, "Select Swing Toggle", "Selects the swing toggle.", { KEY_I });
-    registerBindable("select-jetpack"_spr, "Select Jetpack Toggle", "Selects the jetpack toggle.", { KEY_O });
-
-    // Special Toggles
-    registerBindable("select-trail"_spr, "Select Trail Toggle", "Selects the trail toggle.", { KEY_D });
-    registerBindable("select-ship-fire"_spr, "Select Ship Fire Toggle", "Selects the ship fire toggle.", { KEY_F });
-    registerBindable("select-animation"_spr, "Select Animation Toggle", "Selects the animation toggle.", { KEY_G });
-    registerBindable("select-death"_spr, "Select Death Effect Toggle", "Selects the death effect toggle.", { KEY_H });
-    registerBindable("select-explode"_spr, "Select Explode Toggle", "Selects the explode toggle.", { KEY_J });
-
-    // Color Toggles
-    registerBindable("select-color-1"_spr, "Select Primary Color Toggle", "Selects the primary color toggle.", { KEY_C });
-    registerBindable("select-color-2"_spr, "Select Secondary Color Toggle", "Selects the secondary color toggle.", { KEY_V });
-    registerBindable("select-color-glow"_spr, "Select Glow Color Toggle", "Selects the glow color toggle.", { KEY_B });
-    registerBindable("select-glow"_spr, "Select Glow Toggle", "Selects the glow toggle.", { KEY_N });
-
-    // "Select All" Toggles
-    registerBindable("select-all-icons"_spr, "Select All Icon Toggles", "Selects all icon toggles.", { KEY_P });
-    registerBindable("select-all-specials"_spr, "Select All Special Toggles", "Selects all special toggles.", { KEY_K });
-    registerBindable("select-all-colors"_spr, "Select All Color Toggles", "Selects all color toggles.", { KEY_M });
-
-    // Randomize Buttons
-    registerBindable("randomize-toggles"_spr, "Randomize Toggles", "Randomizes the selected toggles.", { KEY_Z });
-    registerBindable("randomize"_spr, "Randomize Icons", "Randomizes the selected icons.", { KEY_Enter, KEY_Space });
-}
-
-$execute {
-    if (auto customKeybinds = Loader::get()->getInstalledMod("geode.custom-keybinds")) {
-        if (customKeybinds->isLoaded()) {
-            registerBindables();
-        }
-        else if (customKeybinds->shouldLoad()) {
-            ModStateEvent(ModEventType::Loaded, customKeybinds).listen([] {
-                registerBindables();
-            }).leak();
-        }
-    }
-}
 
 BIRSelectPopup* BIRSelectPopup::create(GJGarageLayer* garageLayer, CCSpriteFrame* spriteFrame) {
     auto ret = new BIRSelectPopup();
@@ -189,25 +123,24 @@ bool BIRSelectPopup::init(GJGarageLayer* garageLayer, CCSpriteFrame* spriteFrame
     randomizeTogglesButton->setID("randomize-toggles-button");
     m_buttonMenu->addChild(randomizeTogglesButton);
 
-    listen(randomizeTogglesButton, "randomize-toggles"_spr);
+    listen(randomizeTogglesButton, "randomize-toggles");
 
     auto randomizeButton = CCMenuItemSpriteExtra::create(ButtonSprite::create("Randomize", 0.8f), this, menu_selector(BIRSelectPopup::onRandomize));
     randomizeButton->setPosition({ 175.0f, 25.0f });
     randomizeButton->setID("randomize-button");
     m_buttonMenu->addChild(randomizeButton);
 
-    listen(randomizeButton, "randomize"_spr);
+    listen(randomizeButton, "randomize");
 
     IconRandomizer::init();
 
     return true;
 }
 
-void BIRSelectPopup::listen(CCMenuItem* item, const std::string& id) {
-    /*addEventListener<InvokeBindFilterV2>([item](InvokeBindEventV2* event) {
-        if (event->isDown()) item->activate();
-        return ListenerResult::Propagate;
-    }, id);*/
+void BIRSelectPopup::listen(CCMenuItem* item, std::string id) {
+    addEventListener(KeybindSettingPressedEventV3(GEODE_MOD_ID, std::move(id)), [item](const Keybind& keybind, bool down, bool repeat) {
+        if (down && !repeat) item->activate();
+    });
 }
 
 void BIRSelectPopup::updateToggles(bool icons, bool specials, bool colors) {
@@ -232,7 +165,7 @@ CCMenuItemToggler* BIRSelectPopup::createToggle(
     menu->addChild(toggler);
     array.push_back(toggler);
 
-    listen(toggler, fmt::format("select-{}"_spr, id));
+    listen(toggler, fmt::format("select-{}", id));
 
     return toggler;
 }
@@ -343,7 +276,7 @@ void BIRSelectPopup::createAllToggle(CCMenu* menu, CCNode* node, const char* tex
     toggler->setID(fmt::format("all-{}-toggle", id));
     menu->addChild(toggler);
 
-    listen(toggler, fmt::format("select-all-{}"_spr, id));
+    listen(toggler, fmt::format("select-all-{}", id));
 
     auto label = CCLabelBMFont::create(text, "bigFont.fnt");
     label->setScale(0.5f);

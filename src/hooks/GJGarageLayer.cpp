@@ -25,21 +25,26 @@ StringMap<int> numbers = {
     { "Dark Aqua", 7 }
 };
 
+$on_mod(Loaded) {
+    auto mod = Mod::get();
+    auto& data = mod->getSavedSettingsData();
+    if (!mod->setSavedValue("migrated-color", true)) {
+        if (auto indexRes = data["randomize-button-color"].asInt()) {
+            auto index = indexRes.unwrap();
+            if (index > 0) {
+                if (auto setting = jasmine::setting::get<std::string>("randomize-button-color-new")) {
+                    setting->setValue(index < names.size() ? names[index] : "Random");
+                }
+            }
+        }
+    }
+}
+
 class $modify(BIRGarageLayer, GJGarageLayer) {
     bool init() override {
         if (!GJGarageLayer::init()) return false;
 
-        auto oldSetting = jasmine::setting::get<int>("randomize-button-color");
-        auto newSetting = jasmine::setting::get<std::string>("randomize-button-color-new");
-        if (oldSetting && newSetting) {
-            int oldRBC = oldSetting->getValue();
-            if (oldRBC > 0) {
-                newSetting->setValue(oldRBC < names.size() ? names[oldRBC] : "Random");
-                oldSetting->setValue(0);
-            }
-        }
-
-        auto it = newSetting ? numbers.find(newSetting->getValue()) : numbers.end();
+        auto it = numbers.find(jasmine::setting::getValue<std::string>("randomize-button-color-new"));
         auto randomizeBtn = CCMenuItemSpriteExtra::create(
             CCSprite::createWithSpriteFrameName(
                 fmt::format("BIR_randomBtn_{:02}_001.png"_spr, it != numbers.end() ? it->second : random::generate(1, 7)).c_str()
