@@ -1,4 +1,7 @@
 # Better Icon Randomizer Changelog
+## v1.5.7 (2026-02-17)
+- Fixed keybind support
+
 ## v1.5.6 (2026-02-14)
 - Ported to Geometry Dash v2.208 / Geode SDK v5.0.0
 

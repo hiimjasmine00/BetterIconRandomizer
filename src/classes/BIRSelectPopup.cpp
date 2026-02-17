@@ -138,7 +138,9 @@ bool BIRSelectPopup::init(GJGarageLayer* garageLayer, CCSpriteFrame* spriteFrame
 }
 
 void BIRSelectPopup::listen(CCMenuItem* item, std::string id) {
-    addEventListener(KeybindSettingPressedEventV3(GEODE_MOD_ID, std::move(id)), [item](const Keybind& keybind, bool down, bool repeat) {
+    addEventListener(KeybindSettingPressedEventV3(GEODE_MOD_ID, std::move(id)), [
+        item
+    ](const Keybind& keybind, bool down, bool repeat, double timestamp) {
         if (down && !repeat) item->activate();
     });
 }

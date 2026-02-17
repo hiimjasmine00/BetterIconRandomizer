@@ -1,12 +1,12 @@
 {
-    "geode": "5.0.0-beta.1",
+    "geode": "5.0.0-beta.3",
     "gd": {
         "android": "2.2081",
         "win": "2.2081",
         "mac": "2.2081",
         "ios": "2.2081"
     },
-    "version": "v1.5.6",
+    "version": "v1.5.7",
     "id": "hiimjustin000.better_icon_randomizer",
     "name": "Better Icon Randomizer",
     "developer": "hiimjasmine00",
@@ -60,138 +60,161 @@
             "name": "Select Cube Toggle",
             "description": "Selects the cube toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-cube",
             "default": "Q"
         },
         "select-ship": {
             "name": "Select Ship Toggle",
             "description": "Selects the ship toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-ship",
             "default": "W"
         },
         "select-ball": {
             "name": "Select Ball Toggle",
             "description": "Selects the ball toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-ball",
             "default": "E"
         },
         "select-ufo": {
             "name": "Select UFO Toggle",
             "description": "Selects the UFO toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-ufo",
             "default": "R"
         },
         "select-wave": {
             "name": "Select Wave Toggle",
             "description": "Selects the wave toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-wave",
             "default": "T"
         },
         "select-robot": {
             "name": "Select Robot Toggle",
             "description": "Selects the robot toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-robot",
             "default": "Y"
         },
         "select-spider": {
             "name": "Select Spider Toggle",
             "description": "Selects the spider toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-spider",
             "default": "U"
         },
         "select-swing": {
             "name": "Select Swing Toggle",
             "description": "Selects the swing toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-swing",
             "default": "I"
         },
         "select-jetpack": {
             "name": "Select Jetpack Toggle",
             "description": "Selects the jetpack toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-jetpack",
             "default": "O"
         },
         "select-trail": {
             "name": "Select Trail Toggle",
             "description": "Selects the trail toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-trail",
             "default": "D"
         },
         "select-ship-fire": {
             "name": "Select Ship Fire",
             "description": "Keybind to select the ship fire toggler.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-ship-fire",
             "default": "F"
         },
         "select-animation": {
             "name": "Select Animation Toggle",
             "description": "Selects the animation toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-animation",
             "default": "G"
         },
         "select-death": {
             "name": "Select Death Effect Toggle",
             "description": "Selects the death effect toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-death",
             "default": "H"
         },
         "select-explode": {
             "name": "Select Explode Toggle",
             "description": "Selects the explode toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-explode",
             "default": "J"
         },
         "select-color-1": {
             "name": "Select Primary Color Toggle",
             "description": "Selects the primary color toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-color-1",
             "default": "C"
         },
         "select-color-2": {
             "name": "Select Secondary Color Toggle",
             "description": "Selects the secondary color toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-color-2",
             "default": "V"
         },
         "select-color-glow": {
             "name": "Select Glow Color Toggle",
             "description": "Selects the glow color toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-color-glow",
             "default": "B"
         },
         "select-glow": {
             "name": "Select Glow Toggle",
             "description": "Selects the glow toggle.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-glow",
             "default": "N"
         },
         "select-all-icons": {
             "name": "Select All Icon Toggles",
             "description": "Selects all icon toggles.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-all-icons",
             "default": "P"
         },
         "select-all-specials": {
             "name": "Select All Special Toggles",
             "description": "Selects all special toggles (animation, death effect, explode).",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-all-specials",
             "default": "K"
         },
         "select-all-colors": {
             "name": "Select All Color Toggles",
             "description": "Selects all color toggles.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/select-all-colors",
             "default": "M"
         },
         "randomize-toggles": {
             "name": "Randomize Toggles",
             "description": "Randomizes the selected toggles.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/randomize-toggles",
             "default": "Z"
         },
         "randomize": {
             "name": "Randomize Icons",
             "description": "Randomizes the selected icons.",
             "type": "keybind",
+            "migrate-from": "hiimjustin000.better_icon_randomizer/randomize",
             "default": ["Enter", "Space"]
         }
     },
