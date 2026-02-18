@@ -1,5 +1,5 @@
 # Better Icon Randomizer Changelog
-## v1.5.7 (2026-02-17)
+## v1.5.7 (2026-02-18)
 - Fixed keybind support
 
 ## v1.5.6 (2026-02-14)
